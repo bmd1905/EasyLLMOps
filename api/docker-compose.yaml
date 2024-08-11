@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  app:
+    user: "${UID:-1000}"
+    hostname: "${HOST:-promptalchemy}"
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_NAME: "${USERNAME:-bmd1905}"
+        USER_ID: "${UID:-1000}"
+    image: promptalchemy
+    container_name: promptalchemy
+    # env_file: .
+    #   - .envs/.app
+    volumes:
+      - ./:/app/
+      - ~/.config/gcloud:${HOME}/.config/gcloud
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 512M
+        reservations:
+          cpus: "0.01"
+          memory: 64M
+    ipc: host
+    init: true
