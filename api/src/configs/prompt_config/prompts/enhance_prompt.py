@@ -74,7 +74,7 @@ SYSTEM_PROMPT = """
 
 
 PROMPT_TEMPLATE = """
-Please improve this prompt:
+Please improve this prompt, give me the final answer (dont include the reasoing or the steps):
 ```
 {prompt}
 ```

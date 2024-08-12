@@ -1,7 +1,8 @@
 from langfuse.openai import openai
-from settings import settings
+
+from src.configs.litellm_config import litellm_config
 
 client = openai.OpenAI(
     api_key='anything',
-    base_url=settings.LITELLM_PROXY_URL,
+    base_url=litellm_config.LITELLM_PROXY_URL,
 )
