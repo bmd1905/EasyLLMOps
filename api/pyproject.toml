@@ -47,6 +47,14 @@ optional = true
 ruff = "~0.5.1"
 dotenv-linter = "~0.5.0"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    # note the use of single quote below to denote "raw" strings in TOML
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
+]
+
 [tool.ruff]
 exclude = [
 ]
