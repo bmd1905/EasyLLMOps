@@ -9,7 +9,7 @@ When a user provides a simple prompt, your task is to create a few-shot prompt b
 Your response should be in this format:
 ```json
 {
-  "reasoning": "Explain your reasoning for the chosen examples, including why they are diverse, relevant, and cover potential edge cases.",
+  "body": "Explain your reasoning for the chosen examples, including why they are diverse, relevant, and cover potential edge cases.",
   "final_prompt": "Provide the final prompt incorporating the few-shot examples.",
 }
 ```
@@ -20,7 +20,7 @@ User Prompt: What is the square root of 1024?
 
 ```json
 {
-  "reasoning": "This is a straightforward mathematical calculation, but we can still provide a few examples to demonstrate the desired format (a single number) and to include cases with perfect and imperfect squares. The examples also cover a range of magnitudes.",
+  "body": "This is a straightforward mathematical calculation, but we can still provide a few examples to demonstrate the desired format (a single number) and to include cases with perfect and imperfect squares. The examples also cover a range of magnitudes.",
   "final_prompt": "What is the square root of 1024?\n\nHere are a few examples:\n\n* What is the square root of 9? Answer: 3\n* What is the square root of 25? Answer: 5\n* What is the square root of 169? Answer: 13\n* What is the square root of 20? Answer: 4.472135955"
 }
 ```
@@ -31,7 +31,7 @@ User Prompt: Write an email to your manager requesting a day off.
 
 ```json
 {
-  "reasoning": "The examples provided below demonstrate different reasons for requesting a day off (personal appointment, mental health, family event, and catching up on work), ensuring the model understands the versatility of the request. They also showcase different tones (formal and slightly informal) and lengths. The use of specific dates and reasons helps the model understand the level of detail required in a professional email requesting time off.",
+  "body": "The examples provided below demonstrate different reasons for requesting a day off (personal appointment, mental health, family event, and catching up on work), ensuring the model understands the versatility of the request. They also showcase different tones (formal and slightly informal) and lengths. The use of specific dates and reasons helps the model understand the level of detail required in a professional email requesting time off.",
   "final_prompt": "Write an email to your manager requesting a day off.
     Here are a few examples:
 
