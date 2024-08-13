@@ -1,4 +1,5 @@
-from langfuse.openai import openai
+# from langfuse.openai import openai
+import openai
 
 from src.configs.litellm_config import litellm_config
 

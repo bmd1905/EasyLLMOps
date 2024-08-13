@@ -19,7 +19,7 @@ class LitellmConfig(BaseSettings):
 
     # Generation parameters
     GENERATION_CONFIG: Dict[str, Any] = {
-        'max_tokens': 128,
+        'max_tokens': 512,
         'temperature': 0.5,
     }
 
