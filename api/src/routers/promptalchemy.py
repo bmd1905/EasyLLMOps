@@ -26,10 +26,7 @@ def load_and_format_prompt(prompt_type: PromptType, init_prompt: str) -> tuple[s
     :return: The formatted prompt and system prompt.
     """
     optimized_prompt = prompt_loader.get_prompt(prompt_type)
-    prompt_template = optimized_prompt.PROMPT_TEMPLATE
-    formatted_prompt = prompt_template.format(prompt=init_prompt)
-    system_prompt = optimized_prompt.SYSTEM_PROMPT
-    return formatted_prompt, system_prompt
+    return optimized_prompt.PROMPT_TEMPLATE.format(prompt=init_prompt), optimized_prompt.SYSTEM_PROMPT
 
 
 @promptalchemy_router.post('/generate')
@@ -44,18 +41,26 @@ async def handle_request(request: PromptRequest) -> Response:
     try:
         init_prompt = request.prompt
         prompt_type = request.prompt_type
-        model = request.model
 
-        logger.info(f'Request received - Prompt: "{init_prompt}", Prompt Type: "{prompt_type}", Model: "{model}"')
+        logger.info(f'Request received - Prompt: "{init_prompt}", Prompt Type: "{prompt_type}"')
 
         # Load and format the prompt
         formatted_prompt, system_prompt = load_and_format_prompt(prompt_type, init_prompt)
 
-        # Enhance the prompt
-        enhanced_prompt = generate_response(formatted_prompt, model, system_prompt)
+        # ------------------------------- Step 1: Enhance Prompt -------------------------------"
+        enhanced_prompt = generate_response(
+            prompt=formatted_prompt,
+            model='gpt-4o-mini',
+            system_prompt=system_prompt,
+            parse=True,
+            prompt_type=prompt_type,
+        )
 
-        # Generate the final response
-        final_response = generate_response(enhanced_prompt, model)
+        # ------------------------------- Step 2: Generate Response -------------------------------
+        final_response = generate_response(
+            prompt=enhanced_prompt.final_prompt,
+            model='gemini-flash',
+        )
 
         return Response(content=final_response, media_type='text/plain')
 

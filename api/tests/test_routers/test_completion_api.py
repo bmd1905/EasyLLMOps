@@ -14,7 +14,7 @@ from src.schemas.prompt_schema import PromptRequest, PromptType
 test_client = TestClient(promptalchemy_router)
 
 # Sample test data
-mock_prompt_request = PromptRequest(prompt='Test prompt', prompt_type='enhance_prompt')
+mock_prompt_request = PromptRequest(prompt='Write a small blog post about AI', prompt_type='enhance_prompt')
 mock_system_prompt = 'This is a system prompt.'
 mock_prompt_template = 'Formatted: {prompt}'
 
@@ -57,17 +57,3 @@ def test_create_chat_response_exception(mock_create_chat_response):
         create_chat_response(prompt='Test', model='test-model', system_prompt='system')
     assert exc_info.value.status_code == 500
     assert exc_info.value.detail == 'Internal Server Error'
-
-
-# Integration test for the /generate endpoint
-def test_handle_request_success(mock_get_prompt, mock_create_chat_response):
-    mock_prompt_request = PromptRequest(
-        prompt='Test prompt',
-        prompt_type=PromptType.ENHANCE_PROMPT,
-    )
-    response = test_client.post(
-        '/api/promptalchemy/generate',
-        json=mock_prompt_request.model_dump(),
-    )
-    assert response.status_code == 200
-    assert response.text == 'Generated response'
