@@ -6,7 +6,7 @@ from openai import APIConnectionError
 from src import logger
 from src.configs.prompt_config.prompt_loader import prompt_loader
 from src.llms.litellm import generate_response
-from src.schemas.prompt_schema import PromptRequest, PromptType
+from src.schemas.prompt_schema import PromptAlchemyResponse, PromptRequest, PromptType
 
 # Create an APIRouter instance for the chatbot routes
 promptalchemy_router = APIRouter(
@@ -50,7 +50,7 @@ async def handle_request(request: PromptRequest) -> Response:
         # ------------------------------- Step 1: Enhance Prompt -------------------------------"
         enhanced_prompt = generate_response(
             prompt=formatted_prompt,
-            model='gpt-4o-mini',
+            model='gpt-4o-mini', # TODO: bug when using gemini-flash
             system_prompt=system_prompt,
             parse=True,
             prompt_type=prompt_type,
@@ -62,7 +62,10 @@ async def handle_request(request: PromptRequest) -> Response:
             model='gemini-flash',
         )
 
-        return Response(content=final_response, media_type='text/plain')
+        return PromptAlchemyResponse(
+            optimized_prompt=enhanced_prompt.final_prompt,
+            content=final_response,
+        )
 
     except RequestValidationError as e:
         logger.error(f'Validation error: {e}')

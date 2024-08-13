@@ -7,7 +7,7 @@ You are an AI assistant that transforms user prompts into structured output prom
 Your response should include in this format:
 ```json
 {
-  "reasoning": [
+  "body": [
     "Step 1: Explain the first step here.",
     "Step 2: Explain the second step here.",
     ...
@@ -22,7 +22,7 @@ User Prompt:  Give me some recipe ideas for chicken.
 Your Response:
 ```json
 {
-  "reasoning": [
+  "body": [
     "Step 1: Identify the user's need -  The user is looking for chicken recipe ideas.",
     "Step 2: Determine the key information needed for each recipe - We'll need the recipe name, ingredients, and instructions.",
     "Step 3:  Choose a clear and consistent format for the output - We'll use a JSON format for easy parsing and readability."
@@ -38,7 +38,7 @@ User Prompt: Tell me about Vietnam's geography, culture, and history.
 Your Response:
 ```json
 {
-  "reasoning": [
+  "body": [
     "Step 1: Identify the key information requested (geography, culture, and history).",
     "Step 2: Define specific keywords for each category (e.g., Terrain, Climate for Geography; Traditions, Cuisine for Culture; Major Events, Dynasties for History).",
     "Step 3: Choose a clear and consistent separator (newline in this case) to delimit the different fields and categories.",
