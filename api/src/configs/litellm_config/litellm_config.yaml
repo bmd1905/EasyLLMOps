@@ -3,12 +3,15 @@ model_list:
     litellm_params:
       model: gemini/gemini-1.5-flash-latest
       api_key: os.environ/GEMINI_API_KEY
+      rpm: 50
 
   - model_name: gpt-4o-mini
     litellm_params:
       model: openai/gpt-4o-mini
       api_key: os.environ/OPENAI_API_KEY
+      rpm: 50
 
 litellm_settings:
+  drop_params: True
   set_verbose: True
   cache: True          # set cache responses to True, litellm defaults to using a redis cache

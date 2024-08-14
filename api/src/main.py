@@ -8,7 +8,7 @@ from slowapi.util import get_remote_address
 
 from .dependencies import shutdown, startup
 from .middleware import setup_middleware
-from .routers import chatbot_router, promptalchemy_router
+from .routers import chatbot_router, conversation_router, promptalchemy_router
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -48,6 +48,7 @@ litellm.failure_callback = ['langfuse']
 # Include application routers
 app.include_router(chatbot_router)
 app.include_router(promptalchemy_router)
+app.include_router(conversation_router)
 
 # Entry point for the application
 if __name__ == '__main__':

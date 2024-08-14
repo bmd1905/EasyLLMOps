@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from src import logger
 from src.configs.litellm_config import litellm_config
 from src.llms.base import client
-from src.schemas.prompt_schema import PromptAlchemyOut, response_format_map
+from src.schemas.prompt_schema import response_format_map
 
 
 def content_to_json(content: str) -> dict:
@@ -26,13 +26,14 @@ def content_to_json(content: str) -> dict:
         raise HTTPException(status_code=500, detail='Internal Server Error: Invalid JSON')
 
 
-def generate_response(
+async def generate_response(
     prompt: str,
     model: str,
     system_prompt: str = '',
     stream: bool = False,
     parse: bool = False,
     prompt_type: str = None,
+    history: list = None,  # Add history parameter
 ) -> str | dict:
     """
     Generate a response from the LLM.
@@ -43,6 +44,7 @@ def generate_response(
     :param stream: Whether to stream the response or not.
     :param parse: Whether to parse the response as JSON.
     :param prompt_type: The prompt type.
+    :param history: The conversation history.
 
     :return: The response from the LLM.
     """
@@ -50,27 +52,28 @@ def generate_response(
     # Get the response format based on the prompt type
     response_format = response_format_map.get(prompt_type) if prompt_type else None
 
-    # Create the chat response
-    response = create_chat_response(prompt, model, system_prompt, stream, parse=parse, response_format=response_format)
+    # Assuming create_chat_response involves I/O-bound tasks
+    response = await create_chat_response(
+        prompt, model, system_prompt, stream, parse=parse, response_format=response_format, history=history
+    )
 
-    # Return the response in the specified format
     if stream:
         return response
 
-    # Parse the response content as JSON
     if parse:
         return response.choices[0].message.parsed
 
     return response.choices[0].message.content
 
 
-def create_chat_response(
+async def create_chat_response(
     prompt: str,
     model: str = 'gemini-flash',
     system_prompt: str = '',
     stream: bool = False,
     parse: bool = False,
     response_format: BaseModel = None,
+    history: list = None,  # Add history parameter
 ) -> dict:
     """
     Create a chat response from the LLM.
@@ -81,27 +84,30 @@ def create_chat_response(
     :param stream: Whether to stream the response or not.
     :param parse: Whether to parse the response as JSON.
     :param response_format: The response format.
+    :param history: The conversation history.
 
     :return: The response from the LLM.
     """
     try:
+        # Prepare messages with history
+        messages = [{'role': 'system', 'content': system_prompt}]
+        if history:
+            for turn in history:
+                messages.append({'role': 'user', 'content': turn[0]})
+                messages.append({'role': 'assistant', 'content': turn[1]})
+        messages.append({'role': 'user', 'content': prompt})
+
         if parse:
-            return client.beta.chat.completions.parse(
+            return await client.beta.chat.completions.parse(
                 model=model,
-                messages=[
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user', 'content': prompt},
-                ],
+                messages=messages,  # Use messages with history
                 response_format=response_format,
                 **litellm_config.GENERATION_CONFIG,
             )
 
-        return client.chat.completions.create(
+        return await client.chat.completions.create(
             model=model,
-            messages=[
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': prompt},
-            ],
+            messages=messages,  # Use messages with history
             stream=stream,
             **litellm_config.GENERATION_CONFIG,
         )
@@ -111,7 +117,7 @@ def create_chat_response(
 
     except APIError as e:
         logger.error(f'OpenAI API error: {e}')
-        raise HTTPException(status_code=500, detail='Internal Server Error: OpenAI API Error')
+        raise HTTPException(status_code=500, detail='Internal Server Error')
 
     except Exception as e:
         logger.error(f'Error creating chat response: {e}')

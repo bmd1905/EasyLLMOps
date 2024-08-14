@@ -29,6 +29,7 @@ pydantic-settings = "^2.4.0"
 isort = "^5.13.2"
 redis = "^5.0.8"
 litellm = {extras = ["proxy"], version = "^1.43.9"}
+gradio = "^4.41.0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -121,6 +122,7 @@ ignore = [
 
 [tool.ruff.format]
 quote-style = "single"
+
 
 
 
