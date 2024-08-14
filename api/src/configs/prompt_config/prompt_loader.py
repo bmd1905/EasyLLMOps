@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from src import logger
 from src.configs.path_config import path_config
-from src.schemas.prompt_schema import PromptModel
+from src.schemas.prompt_schema import PromptModel, PromptType
 
 
 class PromptLoaderStrategy:
@@ -139,3 +139,10 @@ prompt_loader = PromptLoader()
 
 # Log the number of loaded prompts
 logger.info(f'Loaded {len(prompt_loader.prompts)} prompts:')
+
+
+# Preload the prompt templates for better performance
+PROMPT_TEMPLATES = {prompt_type: prompt_loader.get_prompt(prompt_type).PROMPT_TEMPLATE for prompt_type in PromptType}
+
+# Preload the system prompts for better performance
+SYSTEM_PROMPTS = {prompt_type: prompt_loader.get_prompt(prompt_type).SYSTEM_PROMPT for prompt_type in PromptType}
