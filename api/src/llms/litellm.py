@@ -66,6 +66,70 @@ async def generate_response(
     return response.choices[0].message.content
 
 
+async def generate_response_stream(
+    prompt: str,
+    model: str,
+    system_prompt: str = '',
+    parse: bool = False,
+    prompt_type: str = None,
+    history: list = None,  # Add history parameter
+):
+    """
+    Generate a streaming response from the LLM.
+
+    :param prompt: The user prompt.
+    :param model: The LLM model to use.
+    :param system_prompt: The system prompt.
+    :param parse: Whether to parse the response as JSON.
+    :param prompt_type: The prompt type.
+    :param history: The conversation history.
+
+    :return: An async generator yielding chunks of the response.
+    """
+    # Get the response format based on the prompt type
+    response_format = response_format_map.get(prompt_type) if prompt_type else None
+
+    response = await create_chat_response(
+        prompt, model, system_prompt, stream=True, parse=parse, response_format=response_format, history=history
+    )
+
+    async for chunk in response:
+        yield chunk
+
+
+async def generate_response_non_stream(
+    prompt: str,
+    model: str,
+    system_prompt: str = '',
+    parse: bool = False,
+    prompt_type: str = None,
+    history: list = None,  # Add history parameter
+) -> str | dict:
+    """
+    Generate a non-streaming response from the LLM.
+
+    :param prompt: The user prompt.
+    :param model: The LLM model to use.
+    :param system_prompt: The system prompt.
+    :param parse: Whether to parse the response as JSON.
+    :param prompt_type: The prompt type.
+    :param history: The conversation history.
+
+    :return: The response from the LLM.
+    """
+    # Get the response format based on the prompt type
+    response_format = response_format_map.get(prompt_type) if prompt_type else None
+
+    response = await create_chat_response(
+        prompt, model, system_prompt, stream=False, parse=parse, response_format=response_format, history=history
+    )
+
+    if parse:
+        return response.choices[0].message.parsed
+
+    return response.choices[0].message.content
+
+
 async def create_chat_response(
     prompt: str,
     model: str = 'gemini-flash',

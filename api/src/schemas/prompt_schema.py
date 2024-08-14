@@ -57,3 +57,14 @@ response_format_map = {
     PromptType.CHAIN_OF_THOUGHT_PROMPT: PromptAlchemyOut,
     PromptType.STRUCTURE_OUTPUT_PROMPT: PromptAlchemyOut,
 }
+
+
+# ------------------------------- Conversation Models -------------------------------
+class ConversationIn(BaseModel):
+    """Pydantic model for conversation input."""
+
+    prompt_type: PromptType
+    message: str
+    history: List[List[str]]
+    stream: bool = False
+    latest_prompt: str = ''

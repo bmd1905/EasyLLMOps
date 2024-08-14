@@ -3626,6 +3626,20 @@ standalone = ["Sphinx (>=5)"]
 test = ["pytest"]
 
 [[package]]
+name = "sseclient"
+version = "0.0.27"
+description = "Python client library for reading Server Sent Event streams."
+optional = false
+python-versions = "*"
+files = [
+    {file = "sseclient-0.0.27.tar.gz", hash = "sha256:b2fe534dcb33b1d3faad13d60c5a7c718e28f85987f2a034ecf5ec279918c11c"},
+]
+
+[package.dependencies]
+requests = ">=2.9"
+six = "*"
+
+[[package]]
 name = "starlette"
 version = "0.37.2"
 description = "The little ASGI library that shines."
@@ -4487,4 +4501,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.14"
-content-hash = "6e7778baf0ad7ebf3a90efd3eab67c3bb815b90238f14f93f99a957645446ca8"
+content-hash = "984544e8994c4a2e23e3790f3eb42db544fb618efd3e28c0cac13ff434d6f255"
