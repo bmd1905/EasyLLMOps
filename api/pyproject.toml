@@ -31,6 +31,15 @@ redis = "^5.0.8"
 litellm = {extras = ["proxy"], version = "^1.43.9"}
 gradio = "^4.41.0"
 sseclient = "^0.0.27"
+opentelemetry-api = "^1.26.0"
+opentelemetry-sdk = "^1.26.0"
+opentelemetry-instrumentation-fastapi = "^0.47b0"
+opentelemetry-instrumentation-requests = "^0.47b0"
+opentelemetry-instrumentation-logging = "^0.47b0"
+opentelemetry-exporter-jaeger = "^1.21.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.26.0"
+opentelemetry-exporter-prometheus = "^0.47b0"
+prometheus-client = "^0.20.0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -123,6 +132,15 @@ ignore = [
 
 [tool.ruff.format]
 quote-style = "single"
+
+
+
+
+
+
+
+
+
 
 
 

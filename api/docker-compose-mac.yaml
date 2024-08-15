@@ -109,19 +109,32 @@ services:
 
 
   cadvisor:
-      image: gcr.io/cadvisor/cadvisor:latest
-      container_name: cadvisor
-      privileged: true
-      restart: unless-stopped
-      volumes:
-      - /:/rootfs:ro
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      ports:
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - --docker_only
+      - --disable_metrics=disk,diskIO,network,tcp,udp,percpu,sched,process,hugetlb,referenced_memory
+      - --store_container_labels=false
+      - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name
+      - --allow_dynamic_housekeeping=true
+      - --housekeeping_interval=10s
+      - --disable_root_cgroup_stats  # Add this to avoid errors related to system UUID and product name
+    environment:
+      - CADVISOR_HEALTHCHECK_URL=http://localhost:8080/healthz
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
       - 8090:8080
-      networks:
-      - monitoring
+
 
 
   prometheus:
