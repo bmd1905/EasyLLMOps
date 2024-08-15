@@ -166,3 +166,6 @@ cython_debug/
 # Redis
 *.rdb
 api/redis-data
+
+# Alermanager
+monitoring/alertmanager_data
