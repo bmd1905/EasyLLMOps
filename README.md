@@ -9,6 +9,9 @@
  
  </div>
 
+
+ [![Pipeline](./assets/prompt_alchemy.png)](#features)
+
  ## Target Audience: Developers
 
 **PromptAlchemy** is a powerful, open-source library designed to transform basic user prompts into sophisticated prompts capable of unlocking the full potential of language models. By leveraging advanced techniques like Chain-of-Thought, Few-Shot Learning, and more, PromptAlchemy empowers developers and researchers to build more intelligent and effective applications.
