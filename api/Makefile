@@ -67,6 +67,10 @@ pre-commit:
 docker-compose-dev-up:
 	sudo docker compose -f docker-compose.yaml up --build
 
+.PHONY: docker-compose-mac-dev-up
+docker-compose-mac-dev-up:
+	sudo docker compose -f docker-compose-mac.yaml up --build
+
 .PHONY: docker-compose-dev-down
 docker-compose-dev-down:
 	sudo docker compose -f docker-compose.yaml down

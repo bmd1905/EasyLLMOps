@@ -167,6 +167,10 @@ cython_debug/
 *.rdb
 api/redis-data
 
-
 # DS_Store in subfolders
 **/.DS_Store
+
+
+# Alermanager
+monitoring/alertmanager_data
+
