@@ -166,3 +166,7 @@ cython_debug/
 # Redis
 *.rdb
 api/redis-data
+
+
+# DS_Store in subfolders
+**/.DS_Store
