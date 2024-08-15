@@ -1,0 +1,22 @@
+groups:
+- name: System alerts
+  rules:
+  - alert: NodeOutOfMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: Node out of memory
+      description: Node memory has reached {{ humanize $value}}%
+
+- name: Containers
+  rules:
+  - alert: OCRHighMemory
+    expr: sum(rate(container_cpu_usage_seconds_total{name="demo-metrics"}[5m]))*100 > 100
+    for: 30s # Send out noti if the condition is true for more than 30 seconds
+    labels:
+      severity: warning
+    annotations:
+      summary: OCR high cpu usage
+      description: OCR cpu consumption is at {{ humanize $value}}%
