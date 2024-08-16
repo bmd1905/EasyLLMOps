@@ -40,20 +40,20 @@ const ChatInput = ({ onSubmit, isLoading }) => {
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit} width="100%">
+    <Box as="form" onSubmit={handleSubmit} width="90%" mx="auto">
       <InputGroup size="md">
         <Textarea
           ref={textareaRef}
           value={message}
           onChange={handleInputChange}
           placeholder="Type your message..."
-          pr="4.5rem"
+          pr="5.5rem"
           minH="60px"
           maxH="200px"
           resize="none"
           bg={bgColor}
           pt="6"
-          pl="4"
+          pl="6"
           borderColor={borderColor}
           borderRadius="xl"
           _focus={{

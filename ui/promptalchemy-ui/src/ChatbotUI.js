@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Flex,
@@ -8,7 +8,6 @@ import {
   useColorMode,
   Heading,
   Container,
-  Icon,
   Avatar,
   Tooltip,
   useToast,
@@ -22,21 +21,24 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react';
-import {DeleteIcon, SettingsIcon} from '@chakra-ui/icons';
+import { DeleteIcon, SettingsIcon, ChevronRightIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { motion, AnimatePresence } from 'framer-motion';
 import MessageBubble from './MessageBubble';
 import SettingsPanel from './SettingsPanel';
 import TypingIndicator from './TypingIndicator';
 import ChatInput from './ChatInput';
+import useChat from './useChat';
 
-// Custom theme
+// Custom theme with glassmorphism styles
 const theme = extendTheme({
   styles: {
     global: (props) => ({
       body: {
-        bg: props.colorMode === 'dark' 
-          ? 'linear-gradient(to bottom right, #1a202c, #2d3748)'
-          : 'linear-gradient(to bottom right, #e2e8f0, #edf2f7)',
-        transition: 'background-color 0.2s ease-in-out',
+        // Use linear gradient
+        // bg: 'linear-gradient(45deg, #C7C8CC 0%, #ffffff 99%, #ffffff 100%)',
+        // Use smooth radial gradient
+        bg: 'radial-gradient(circle, #C7C8CC 0%, #ffffff 99%, #ffffff 100%)',
+        backgroundAttachment: 'fixed',
       },
     }),
   },
@@ -44,137 +46,38 @@ const theme = extendTheme({
     Button: {
       baseStyle: {
         borderRadius: 'full',
+        bg: 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.18)',
+        _hover: {
+          bg: 'rgba(255, 255, 255, 0.2)',
+        },
       },
     },
     Input: {
       baseStyle: {
-        borderRadius: 'full',
-      },
-    },
-    Select: {
-      baseStyle: {
-        borderRadius: 'full',
+        field: {
+          borderRadius: 'full',
+          bg: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
+        },
       },
     },
   },
 });
 
-// Custom scrollbar styles
-const customScrollbarStyles = {
-  '&::-webkit-scrollbar': {
-    width: '4px',
-  },
-  '&::-webkit-scrollbar-track': {
-    width: '6px',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'blue.500',
-    borderRadius: '24px',
-  },
-};
+// Update glassContainer to be a function that returns an object
+const glassContainer = (colorMode) => ({
+  bg: colorMode === 'dark' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+  borderRadius: '20px',
+  border: colorMode === 'dark' ? '0.5px solid rgba(255, 255, 255, 0.18)' : '0.5px solid rgba(0, 0, 0, 0.18)',
+});
 
-// Custom hook for chat functionality
-const useChat = () => {
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+// Motion components
+const MotionBox = motion(Box);
+const MotionFlex = motion(Flex);
 
-  const addMessage = useCallback((newMessage) => {
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-  }, []);
-
-  const clearChat = useCallback(() => {
-    setMessages([]);
-  }, []);
-
-  const sendMessage = useCallback(async (inputMessage, settings) => {
-    setIsLoading(true);
-    setIsTyping(true);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/promptalchemy_conversation/conversation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt_type: settings.promptType,
-          message: inputMessage,
-          history: messages.map(m => [m.role === 'user' ? m.content : '', m.role === 'assistant' ? m.content : '']),
-          stream: settings.isStreaming = false,
-          latest_prompt: inputMessage,
-          model: settings.model,
-          token_count: settings.tokenCount,
-          temperature: settings.temperature,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      if (settings.isStreaming) {
-        setIsTyping(false);
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let accumulatedResponse = '';
-
-        addMessage({ role: 'assistant', content: '', timestamp: new Date() });
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          accumulatedResponse += chunk;
-
-          setMessages(prevMessages => {
-            const updatedMessages = [...prevMessages];
-            updatedMessages[updatedMessages.length - 1] = { role: 'assistant', content: accumulatedResponse, timestamp: new Date() };
-            return updatedMessages;
-          });
-        }
-      } else {
-        const data = await response.json();
-        addMessage({ role: 'assistant', content: data.response, timestamp: new Date() });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      // Handle error (e.g., show toast notification)
-    } finally {
-      setIsLoading(false);
-      setIsTyping(false);
-    }
-  }, [messages, addMessage]);
-
-  return {
-    messages,
-    isLoading,
-    isTyping,
-    addMessage,
-    clearChat,
-    sendMessage,
-  };
-};
-
-// Floating action button for mobile
-const FloatingActionButton = ({ onOpen }) => {
-  return (
-    <Box position="fixed" bottom="20px" right="20px">
-      <Button
-        onClick={onOpen}
-        borderRadius="full"
-        w="60px"
-        h="60px"
-        bg="blue.500"
-        color="white"
-        _hover={{ bg: 'blue.600' }}
-      >
-        <Icon as={SettingsIcon} />
-      </Button>
-    </Box>
-  );
-};
-
-// Main ChatbotUI component
 const ChatbotUI = () => {
   const {
     messages,
@@ -185,9 +88,8 @@ const ChatbotUI = () => {
     sendMessage,
   } = useChat();
 
-  const [inputMessage, setInputMessage] = useState('');
   const [settings, setSettings] = useState({
-    isStreaming: false,
+    isStreaming: true,
     promptType: 'enhance_prompt',
     model: 'Model A',
     tokenCount: 512,
@@ -196,30 +98,25 @@ const ChatbotUI = () => {
     codeExecution: false,
   });
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const [isLargerThan1280] = useMediaQuery("(min-width: 1280px)");
   const chatContainerRef = useRef(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
 
-  const [message, setMessage] = useState('');
-  const [charCount, setCharCount] = useState(0);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const textareaRef = useRef(null);
-
   const updateSetting = useCallback((key, value) => {
     setSettings(prevSettings => ({ ...prevSettings, [key]: value }));
   }, []);
 
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || isLoading) return;
-
-    const newMessage = { role: 'user', content: inputMessage, timestamp: new Date() };
-    addMessage(newMessage);
-    sendMessage(inputMessage, settings);
-    setInputMessage('');
-  }, [inputMessage, isLoading, addMessage, sendMessage, settings]);
+  const handleToggleColorMode = () => {
+    toggleColorMode();
+    toast({
+      title: `${colorMode === 'light' ? 'Dark' : 'Light'} mode activated`,
+      status: 'info',
+      duration: 2000,
+      isClosable: true,
+    });
+  };
 
   const handleClearChat = useCallback(() => {
     clearChat();
@@ -231,6 +128,10 @@ const ChatbotUI = () => {
       isClosable: true,
     });
   }, [clearChat, toast]);
+
+  const toggleSettings = useCallback(() => {
+    setIsSettingsOpen(prev => !prev);
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -245,65 +146,126 @@ const ChatbotUI = () => {
     }
   }, [colorMode, toggleColorMode]);
 
+  const renderMessages = useMemo(() => (
+    messages.map((message, index) => (
+      <Flex key={index} justify={message.role === 'user' ? 'flex-end' : 'flex-start'}>
+        {message.role === 'assistant' && (
+          <Avatar size="sm" name="Assistant" src="/ai-avatar.png" mr={2} />
+        )}
+        <MessageBubble
+          message={message}
+          onThumbsUp={() => {/* Implement thumbs up logic */}}
+          onThumbsDown={() => {/* Implement thumbs down logic */}}
+          onCopy={() => {
+            navigator.clipboard.writeText(message.content);
+            toast({
+              title: 'Copied',
+              status: 'success',
+              duration: 2000,
+            });
+          }}
+        />
+        {message.role === 'user' && (
+          <Avatar size="sm" name="You" src="/user-avatar.png" ml={2} />
+        )}
+      </Flex>
+    ))
+  ), [messages, toast]);
+
   return (
     <ChakraProvider theme={theme}>
-      <Container maxW="container.xl" p={0}>
-        <Flex h="100vh" bgGradient={colorMode === 'dark' ? 'linear-gradient(to bottom right, #1a202c, #2d3748)' : 'linear-gradient(to bottom right, #e2e8f0, #edf2f7)'}>
+      <Container maxW="100%" p={2} h="100vh">
+        <MotionFlex
+          h="calc(100vh - 16px)"
+          sx={{
+            ...glassContainer(colorMode),
+            position: 'relative',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          overflow="hidden"
+        >
           {/* Chat Area */}
-          <Flex direction="column" flex={1} h="100%" overflowX="hidden">
-            <Flex justify="space-between" align="center" p={4} borderBottomWidth={1} bgGradient={colorMode === 'dark' ? 'linear-gradient(to bottom right, #1a202c, #2d3748)' : 'linear-gradient(to bottom right, #e2e8f0, #edf2f7)'}>
-              <Heading size="lg" color="blue.500">Prompt Alchemy</Heading>
-              <HStack>
+          <MotionFlex
+            layout
+            direction="column"
+            flex={1}
+            p={5}
+            h="100%"
+            overflowX="hidden"
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <Flex justify="space-between" align="center" p={2} borderBottomWidth={1} borderColor={colorMode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.18)'}>
+              <Heading size="md" pl="2" color={colorMode === 'dark' ? 'white' : 'black'}>Prompt Alchemy</Heading>
+              <HStack spacing={1}>
+                {/* Toggle Color Mode */}
+                {/* <Tooltip label={colorMode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
+                  <Button onClick={handleToggleColorMode} size="sm" variant="ghost">
+                    {colorMode === 'light' ? <MoonIcon color="black" /> : <SunIcon color="white" />}
+                  </Button>
+                </Tooltip> */}
                 <Tooltip label="Clear Chat">
                   <Button onClick={handleClearChat} size="sm" colorScheme="red" variant="ghost">
-                    <DeleteIcon />
+                    <DeleteIcon color={colorMode === 'dark' ? 'white' : 'black'} />
                   </Button>
                 </Tooltip>
-                {!isLargerThan1280 && (
+                {isLargerThan1280 ? (
+                  <Tooltip label={isSettingsOpen ? "Hide Settings" : "Show Settings"}>
+                    <MotionBox
+                      as={Button}
+                      onClick={toggleSettings}
+                      size="sm"
+                      variant="ghost"
+                      animate={{ rotate: isSettingsOpen ? 0 : 180 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronRightIcon color={colorMode === 'dark' ? 'white' : 'black'} />
+                    </MotionBox>
+                  </Tooltip>
+                ) : (
                   <Tooltip label="Settings">
                     <Button onClick={() => setIsSettingsOpen(true)} size="sm" variant="ghost">
-                      <SettingsIcon />
+                      <SettingsIcon color={colorMode === 'dark' ? 'white' : 'black'} />
                     </Button>
                   </Tooltip>
                 )}
               </HStack>
             </Flex>
   
-            <Box flex={1} overflowY="auto" ref={chatContainerRef} p={4} sx={customScrollbarStyles}>
-              <VStack spacing={4} align="stretch">
-                {messages.map((message, index) => (
-                  <Flex key={index} justify={message.role === 'user' ? 'flex-end' : 'flex-start'}>
-                    {message.role === 'assistant' && (
-                      <Avatar size="sm" name="AI" src="/ai-avatar.png" mr={2} />
-                    )}
-                    <MessageBubble
-                      message={message}
-                      onThumbsUp={() => {/* Implement thumbs up logic */}}
-                      onThumbsDown={() => {/* Implement thumbs down logic */}}
-                      onCopy={() => {
-                        navigator.clipboard.writeText(message.content);
-                        toast({
-                          title: 'Copied to clipboard',
-                          status: 'success',
-                          duration: 2000,
-                        });
-                      }}
-                    />
-                    {message.role === 'user' && (
-                      <Avatar size="sm" name="You" src="/user-avatar.png" ml={2} />
-                    )}
-                  </Flex>
-                ))}
-                {isTyping && !settings.isStreaming && (
+            <Box 
+              flex={1} 
+              overflowY="auto" 
+              ref={chatContainerRef} 
+              p={2} 
+              sx={{
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: colorMode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                  borderRadius: '24px',
+                },
+              }}
+            >
+              <VStack spacing={2} align="stretch" width="90%" mx="auto">
+                {/* Chat Messages */}
+                {renderMessages}
+                {/* Typing Indicator */}
+                {isTyping && settings.isStreaming && (
                   <Flex align="center" alignSelf="flex-start">
-                    <Avatar size="sm" name="AI" src="/ai-avatar.png" mr={2} />
-                    <TypingIndicator />
+                    <Avatar size="xs" name="Assistant" src="/ai-avatar.png" mr={2} />
+                    <TypingIndicator dotCount={3} dotColor={colorMode === 'dark' ? 'white' : 'black'} dotSize={6} animationSpeed={2} />
                   </Flex>
                 )}
               </VStack>
             </Box>
   
-            <Box p={4} borderTopWidth={1} bgGradient={colorMode === 'dark' ? 'linear-gradient(to bottom right, #1a202c, #2d3748)' : 'linear-gradient(to bottom right, #e2e8f0, #edf2f7)'}>
+            {/* Chat Input */}
+            <Box p={2} borderTopWidth={0} pb="-10" borderColor={colorMode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.18)'}>
               <ChatInput
                 onSubmit={(message) => {
                   const newMessage = { role: 'user', content: message, timestamp: new Date() };
@@ -311,45 +273,52 @@ const ChatbotUI = () => {
                   sendMessage(message, settings);
                 }}
                 isLoading={isLoading}
+                colorMode={colorMode}
               />
             </Box>
-          </Flex>
+          </MotionFlex>
   
           {/* Settings Area */}
           {isLargerThan1280 ? (
-            <Box
-              width="250px"
-              bgGradient={colorMode === 'dark' ? 'linear-gradient(to bottom right, #1a202c, #2d3748)' : 'linear-gradient(to bottom right, #e2e8f0, #edf2f7)'}
-              p={4}
-              borderLeftWidth={1}
-              overflowY="auto"
-            >
-              <Heading size="md" mb={4}>Settings</Heading>
-              <SettingsPanel settings={settings} updateSetting={updateSetting} />
-            </Box>
+            <AnimatePresence>
+              {isSettingsOpen && (
+                <MotionBox
+                  layout
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: "300px", opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  p={2}
+                  borderLeftWidth={1}
+                  borderColor={colorMode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.18)'}
+                  overflowY="auto"
+                  h="100%"
+                  sx={glassContainer(colorMode)}
+                >
+                  <SettingsPanel settings={settings} updateSetting={updateSetting} colorMode={colorMode} />
+                </MotionBox>
+              )}
+            </AnimatePresence>
           ) : (
-            <>
-              <Drawer
-                isOpen={isSettingsOpen}
-                placement="right"
-                onClose={() => setIsSettingsOpen(false)}
-              >
-                <DrawerOverlay />
-                <DrawerContent>
-                  <DrawerCloseButton />
-                  <DrawerHeader>Settings</DrawerHeader>
-                  <DrawerBody>
-                    <SettingsPanel settings={settings} updateSetting={updateSetting} />
-                  </DrawerBody>
-                </DrawerContent>
-              </Drawer>
-              <FloatingActionButton onOpen={() => setIsSettingsOpen(true)} />
-            </>
+            <Drawer
+              isOpen={isSettingsOpen}
+              placement="right"
+              onClose={() => setIsSettingsOpen(false)}
+            >
+              <DrawerOverlay />
+              <DrawerContent sx={glassContainer(colorMode)}>
+                <DrawerCloseButton color={colorMode === 'dark' ? 'white' : 'black'} />
+                <DrawerHeader color={colorMode === 'dark' ? 'white' : 'black'}>Settings</DrawerHeader>
+                <DrawerBody>
+                  <SettingsPanel settings={settings} updateSetting={updateSetting} colorMode={colorMode} />
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>
           )}
-        </Flex>
+        </MotionFlex>
       </Container>
     </ChakraProvider>
   );
 }
 
-export default ChatbotUI;
+export default React.memo(ChatbotUI);
