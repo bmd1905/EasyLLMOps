@@ -1,0 +1,73 @@
+version: '3.9'
+
+networks:
+    monitoring:
+
+volumes:
+    prometheus_data:
+    grafana_data:
+    alertmanager_data:
+
+services:
+  redis:
+    image: redis/redis-stack:7.2.0-v6
+    container_name: redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./redis-data:/data
+    environment:
+      REDIS_ARGS: "--appendonly yes"
+    networks:
+      - default
+      - monitoring
+
+  promptalchemy:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: promptalchemy
+    container_name: promptalchemy
+    command: ["sh", "-c", "make start-standalone-server"]
+    volumes:
+      - ./src:/app/src
+      - ./poetry.lock:/app/poetry.lock
+      - ./pyproject.toml:/app/pyproject.toml
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 512M
+        reservations:
+          cpus: "0.01"
+          memory: 64M
+      labels:
+        - "maintainer=bmd1905"
+    depends_on:
+      - redis
+    networks:
+      - default
+      - monitoring
+
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    ports:
+      - "4000:4000" # Map the container port to the host, change the host port if necessary
+    volumes:
+      - ./src/configs/litellm_config/litellm_config.yaml:/app/config.yaml # Mount the local configuration file
+    # You can change the port or number of workers as per your requirements or pass any new supported CLI augument. Make sure the port passed here matches with the container port defined above in `ports` value
+    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "4" ]
+    env_file:
+      - .env
+    networks:
+      - default
+      - monitoring
