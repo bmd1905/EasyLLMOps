@@ -36,9 +36,9 @@ import {
 } from 'lucide-react';
 
 // Import images
-import groqIcon from './static/imgs/models/groq-icon.png';
-import openaiIcon from './static/imgs/models/openai-icon.png';
-import claudeIcon from './static/imgs/models/claude-icon.png';
+import groqIcon from './imgs/models/groq-icon.png';
+import openaiIcon from './imgs/models/openai-icon.png';
+import claudeIcon from './imgs/models/claude-icon.png';
 
 const SettingsPanel = ({ settings, updateSetting }) => {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
