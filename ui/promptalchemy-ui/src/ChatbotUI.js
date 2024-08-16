@@ -319,6 +319,6 @@ const ChatbotUI = () => {
       </Container>
     </ChakraProvider>
   );
-};
+}
 
 export default React.memo(ChatbotUI);
