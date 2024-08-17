@@ -20,7 +20,7 @@ import { FaThumbsUp, FaThumbsDown, FaRegCopy, FaCheck } from 'react-icons/fa';
 
 const MessageBubble = ({ message, onThumbsUp, onThumbsDown }) => {
   const { colorMode } = useColorMode();
-  const bgGradient = colorMode === 'dark' 
+  const bgGradient = colorMode === 'dark'
     ? 'linear(circle, #C7C8CC 0%, #ffffff 99%, #ffffff 100%)'
     : 'linear(circle, #C7C8CC 0%, #ffffff 99%, #ffffff 100%)';
   const textColor = colorMode === 'dark' ? 'gray.100' : 'gray.800';

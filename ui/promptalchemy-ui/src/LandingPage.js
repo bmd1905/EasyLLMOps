@@ -35,9 +35,9 @@ const PromptAlchemyLanding = () => {
 
   const { scrollYProgress } = useViewportScroll();
   const yRange = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  
+
   const controls = useAnimation();
-  
+
   useEffect(() => {
     controls.start(i => ({
       opacity: 1,
@@ -47,7 +47,7 @@ const PromptAlchemyLanding = () => {
 
     // Performance tracking
     const startTime = performance.now();
-    
+
     return () => {
       const endTime = performance.now();
       console.log('Component mount time:', endTime - startTime);
@@ -87,11 +87,11 @@ const PromptAlchemyLanding = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Image 
+          <Image
             src="/static/logo/logo-transparent.png"
-            alt="PromptAlchemy Logo" 
+            alt="PromptAlchemy Logo"
             pt="inherit"
-            width="250px" 
+            width="250px"
             height="250px"
           />
         </MotionBox>
@@ -129,12 +129,12 @@ const PromptAlchemyLanding = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Image 
-            //   src="/api/placeholder/800/400" 
+            <Image
+            //   src="/api/placeholder/800/400"
                 src="/static/pipeline.png"
-                alt="Prompt transformation visualization" 
-                borderRadius="lg" 
-                shadow="xl" 
+                alt="Prompt transformation visualization"
+                borderRadius="lg"
+                shadow="xl"
                 loading="lazy"
                 mx="auto"
                 width="80%"
