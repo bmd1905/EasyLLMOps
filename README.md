@@ -1,12 +1,12 @@
 
 
 <div align="center">
-  
+
 # PromptAlchemy
 [![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
 
  Transform basic queries into sophisticated prompts for exceptional results.
- 
+
  </div>
 
 

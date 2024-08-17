@@ -177,7 +177,7 @@ services:
       healthcheck:
           test: ["CMD-SHELL", "curl -f localhost:3000/api/health && echo 'ready'"]
           interval: 10s
-          retries: 10         
+          retries: 10
 
 
   jaeger:

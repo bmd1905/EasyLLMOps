@@ -232,12 +232,12 @@ const ChatbotUI = () => {
                 )}
               </HStack>
             </Flex>
-  
-            <Box 
-              flex={1} 
-              overflowY="auto" 
-              ref={chatContainerRef} 
-              p={2} 
+
+            <Box
+              flex={1}
+              overflowY="auto"
+              ref={chatContainerRef}
+              p={2}
               sx={{
                 '&::-webkit-scrollbar': {
                   width: '4px',
@@ -263,7 +263,7 @@ const ChatbotUI = () => {
                 )}
               </VStack>
             </Box>
-  
+
             {/* Chat Input */}
             <Box p={2} borderTopWidth={0} pb="-10" borderColor={colorMode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.18)'}>
               <ChatInput
@@ -277,7 +277,7 @@ const ChatbotUI = () => {
               />
             </Box>
           </MotionFlex>
-  
+
           {/* Settings Area */}
           {isLargerThan1280 ? (
             <AnimatePresence>
