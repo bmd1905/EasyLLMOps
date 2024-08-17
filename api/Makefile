@@ -81,4 +81,4 @@ docker-compose-dev-down:
 ############################################################
 .PHONE: start-standalone-server
 start-standalone-server:
-	poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload --log-level info --workers 2
+	poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --log-level info --workers 4
