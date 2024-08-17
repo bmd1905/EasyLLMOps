@@ -2,7 +2,6 @@ import json
 
 from fastapi import HTTPException
 from openai import APIError, RateLimitError
-from pydantic import BaseModel
 
 from src import logger
 from src.configs.litellm_config import litellm_config
@@ -10,150 +9,30 @@ from src.llms.base import client
 from src.schemas.prompt_schema import response_format_map
 
 
-def content_to_json(content: str) -> dict:
-    """
-    Convert the content to a JSON object.
-
-    :param content: The content to convert.
-
-    :return: The JSON object.
-    """
-    try:
-        # Remove the leading/trailing quotes and newlines
-        return json.loads(content[7:-3])
-    except json.JSONDecodeError as e:
-        logger.error(f'Error converting content to JSON: {e}, Content: {content}')
-        raise HTTPException(status_code=500, detail='Internal Server Error: Invalid JSON')
-
-
-async def generate_response(
-    prompt: str,
-    model: str,
-    system_prompt: str = '',
-    stream: bool = False,
-    parse: bool = False,
-    prompt_type: str = None,
-    history: list = None,  # Add history parameter
-) -> str | dict:
-    """
-    Generate a response from the LLM.
-
-    :param prompt: The user prompt.
-    :param model: The LLM model to use.
-    :param system_prompt: The system prompt.
-    :param stream: Whether to stream the response or not.
-    :param parse: Whether to parse the response as JSON.
-    :param prompt_type: The prompt type.
-    :param history: The conversation history.
-
-    :return: The response from the LLM.
-    """
-
-    # Get the response format based on the prompt type
-    response_format = response_format_map.get(prompt_type) if prompt_type else None
-
-    # Assuming create_chat_response involves I/O-bound tasks
-    response = await create_chat_response(
-        prompt, model, system_prompt, stream, parse=parse, response_format=response_format, history=history
-    )
-
-    if stream:
-        return response
-
-    if parse:
-        return response.choices[0].message.parsed
-
-    return response.choices[0].message.content
-
-
-async def generate_response_stream(
-    prompt: str,
-    model: str,
-    system_prompt: str = '',
-    parse: bool = False,
-    prompt_type: str = None,
-    history: list = None,  # Add history parameter
-):
-    """
-    Generate a streaming response from the LLM.
-
-    :param prompt: The user prompt.
-    :param model: The LLM model to use.
-    :param system_prompt: The system prompt.
-    :param parse: Whether to parse the response as JSON.
-    :param prompt_type: The prompt type.
-    :param history: The conversation history.
-
-    :return: An async generator yielding chunks of the response.
-    """
-    # Get the response format based on the prompt type
-    response_format = response_format_map.get(prompt_type) if prompt_type else None
-
-    response = await create_chat_response(
-        prompt, model, system_prompt, stream=True, parse=parse, response_format=response_format, history=history
-    )
-
-    async for chunk in response:
-        yield chunk
-
-
-async def generate_response_non_stream(
-    prompt: str,
-    model: str,
-    system_prompt: str = '',
-    parse: bool = False,
-    prompt_type: str = None,
-    history: list = None,  # Add history parameter
-) -> str | dict:
-    """
-    Generate a non-streaming response from the LLM.
-
-    :param prompt: The user prompt.
-    :param model: The LLM model to use.
-    :param system_prompt: The system prompt.
-    :param parse: Whether to parse the response as JSON.
-    :param prompt_type: The prompt type.
-    :param history: The conversation history.
-
-    :return: The response from the LLM.
-    """
-    # Get the response format based on the prompt type
-    response_format = response_format_map.get(prompt_type) if prompt_type else None
-
-    response = await create_chat_response(
-        prompt, model, system_prompt, stream=False, parse=parse, response_format=response_format, history=history
-    )
-
-    if parse:
-        return response.choices[0].message.parsed
-
-    return response.choices[0].message.content
-
-
-async def create_chat_response(
+async def generate_llm_response(
     prompt: str,
     model: str = 'gemini-flash',
     system_prompt: str = '',
     stream: bool = False,
-    parse: bool = False,
-    response_format: BaseModel = None,
-    history: list = None,  # Add history parameter
-) -> dict:
+    prompt_type: str = None,
+    history: list = None,
+    json_mode: bool = False,
+) -> str | dict:
     """
-    Create a chat response from the LLM.
+    Generates a response from the LLM, handling both streaming and non-streaming cases.
 
-    :param prompt: The user prompt.
-    :param model: The LLM model to use.
-    :param system_prompt: The system prompt.
-    :param stream: Whether to stream the response or not.
-    :param parse: Whether to parse the response as JSON.
-    :param response_format: The response format.
-    :param history: The conversation history.
+    :param prompt: The prompt to generate a response for
+    :param model: The model to use for generating the response
+    :param system_prompt: The system prompt to use for the conversation
+    :param stream: Whether to stream the response
+    :param prompt_type: The type of prompt to use
+    :param history: The conversation history
+    :param json_mode: Whether to return the response in JSON format
 
-    :return: The response from the LLM.
+    :return: The generated response as a string or dictionary
     """
     try:
-        # Prepare messages with history
+        # Create the messages list
         messages = [{'role': 'system', 'content': system_prompt}]
         if history:
             for turn in history:
@@ -161,20 +40,34 @@ async def create_chat_response(
                 messages.append({'role': 'assistant', 'content': turn[1]})
         messages.append({'role': 'user', 'content': prompt})
 
-        if parse:
-            return await client.beta.chat.completions.parse(
-                model=model,
-                messages=messages,  # Use messages with history
-                response_format=response_format,
-                **litellm_config.GENERATION_CONFIG,
-            )
+        # Create the response format
+        response_format = {'type': 'json_object'} if json_mode else None
 
-        return await client.chat.completions.create(
+        # Create the response
+        response = await client.chat.completions.create(
             model=model,
-            messages=messages,  # Use messages with history
+            messages=messages,
             stream=stream,
+            response_format=response_format,
             **litellm_config.GENERATION_CONFIG,
         )
+
+        # Return the response if streaming
+        if stream:
+            return response
+
+        # Parse the response
+        dict_ = json.loads(response.choices[0].message.content)
+
+        # Get the response format
+        response_format = response_format_map.get(prompt_type) if prompt_type else None
+
+        # Log and return the response
+        if response_format:
+            return response_format(**dict_)
+        else:
+            return response
+
     except RateLimitError as e:
         logger.error(f'Rate limit exceeded: {e}')
         raise HTTPException(status_code=429, detail='Rate limit exceeded')

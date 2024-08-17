@@ -6,9 +6,9 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
+from .chat_completion import conversation_router
 from .dependencies import shutdown, startup
 from .middleware import setup_middleware
-from .routers import chatbot_router, conversation_router, promptalchemy_router
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -45,9 +45,7 @@ async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) 
 litellm.success_callback = ['langfuse']
 litellm.failure_callback = ['langfuse']
 
-# Include application routers
-app.include_router(chatbot_router)
-app.include_router(promptalchemy_router)
+# Include application router(s)
 app.include_router(conversation_router)
 
 # Entry point for the application
