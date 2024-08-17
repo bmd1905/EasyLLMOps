@@ -47,7 +47,7 @@ class PromptAlchemyResponse(BaseModel):
 class PromptAlchemyOut(BaseModel):
     """Pydantic model for prompt alchemy output."""
 
-    body: List[str]
+    body: str
     final_prompt: str
 
 
@@ -63,8 +63,10 @@ response_format_map = {
 class ConversationIn(BaseModel):
     """Pydantic model for conversation input."""
 
-    prompt_type: PromptType
     message: str
     history: List[List[str]]
+    prompt_type: PromptType = PromptType.ENHANCE_PROMPT
     stream: bool = False
     latest_prompt: str = ''
+    model: str = 'gemini-flash'
+    temperature: float = 0.0

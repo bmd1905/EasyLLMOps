@@ -12,6 +12,6 @@ model_list:
       rpm: 50
 
 litellm_settings:
-  drop_params: True
-  set_verbose: True
+  drop_params: False
+  set_verbose: False
   cache: True          # set cache responses to True, litellm defaults to using a redis cache
