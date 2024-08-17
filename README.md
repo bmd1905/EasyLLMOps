@@ -19,7 +19,25 @@
 
 ## Features
 
-Advanced Prompt Engineering: Apply a diverse range of techniques to enhance prompt complexity and effectiveness.
-Customizable Transformations: Tailor prompt engineering processes to specific use cases and model requirements.
-Intuitive API: Seamlessly integrate PromptAlchemy into existing workflows.
-Open-Source Community: Contribute to the development and benefit from community-driven innovations.
+- **Intuitive API**: Easily integrate PromptAlchemy into your projects.
+- **Versatile Techniques**: Apply a range of prompt engineering strategies.
+- **Customizable**: Tailor the transformation process to your specific needs.
+
+
+## Setup
+
+### Jenkins as CI
+Start Jenkins server:
+```
+# Port 8082
+docker compose -f docker-compose-jenkins.yaml up --build
+```
+
+### Manual CD (implement ArgoCD later)
+```
+# Build
+docker build -t bmd1905/promptalchemy_test .
+
+# Then run
+docker run -ti -p 8001:8000 --env-file .env bmd1905/promptalchemy_test
+```

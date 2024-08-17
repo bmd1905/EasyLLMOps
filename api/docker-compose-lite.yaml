@@ -1,12 +1,7 @@
 version: '3.9'
 
 networks:
-    monitoring:
-
-volumes:
-    prometheus_data:
-    grafana_data:
-    alertmanager_data:
+    default:
 
 services:
   redis:
@@ -23,7 +18,6 @@ services:
       REDIS_ARGS: "--appendonly yes"
     networks:
       - default
-      - monitoring
 
   promptalchemy:
     build:
@@ -54,7 +48,6 @@ services:
       - redis
     networks:
       - default
-      - monitoring
 
 
   litellm:
@@ -70,4 +63,3 @@ services:
       - .env
     networks:
       - default
-      - monitoring
