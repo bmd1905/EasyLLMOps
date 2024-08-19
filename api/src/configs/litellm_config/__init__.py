@@ -9,7 +9,7 @@ class LitellmConfig(BaseSettings):
     """
 
     # Proxy URL
-    LITELLM_PROXY_URL: str = 'http://litellm:4000'
+    LITELLM_PROXY_URL: str = 'http://localhost:4000'
 
     # Available models
     MODEL_NAMES: List[str] = [

@@ -18,7 +18,7 @@ const useChat = () => {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/promptalchemy_conversation/conversation', {
+      const response = await fetch('http://localhost:30002/api/promptalchemy_conversation/conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

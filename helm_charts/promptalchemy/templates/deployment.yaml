@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "your-chart.fullname" . }}-env-secret
+  namespace: example
+  labels:
+    app: {{ .Release.Name }}
+type: Opaque
+data:
+  {{- $envData := include "getEnvFile" . | fromYaml }}
+  {{- range $key, $value := $envData }}
+  {{ $key }}: {{ $value | b64enc | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+  namespace: example
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 30000
+          envFrom:
+            - secretRef:
+                name: {{ include "your-chart.fullname" . }}-env-secret
+          resources:
+            limits:
+              cpu: 4
+              memory: 2048Mi
+            requests:
+              cpu: 2
+              memory: 1024Mi

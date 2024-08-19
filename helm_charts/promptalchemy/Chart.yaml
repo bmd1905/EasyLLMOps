@@ -1,0 +1,18 @@
+apiVersion: v2
+name: promptalchemy
+description: My Helm Chart for PromptAlchemy
+
+# A chart can be `application` or `library`,
+# we don't use `library` so often
+type: application
+
+# The chart vesion, which should be changed every time
+# you make an update to the chart
+version: 0.1.0
+
+# The version number of the application being deployed
+appVersion: "1.0.0"
+
+maintainers:
+- email: minhduc2k31905@gmail.com
+  name: bmd1905

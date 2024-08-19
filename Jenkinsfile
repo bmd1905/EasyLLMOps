@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    dir('api') { // Change to the api directory
+                    dir('api') {
                         dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                     }
                 }

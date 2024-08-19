@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+  namespace: example
+spec:
+  selector:
+    app: {{ .Release.Name }}
+  ports:
+    - port: 30000
+      protocol: TCP
+      targetPort: 30000
+  type: ClusterIP
