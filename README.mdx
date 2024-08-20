@@ -1,0 +1,131 @@
+
+
+<div align="center">
+
+# PromptAlchemy
+[![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
+
+ Transform basic queries into sophisticated prompts for exceptional results.
+
+ </div>
+
+ [![Pipeline](./assets/prompt_alchemy.png)](#features)
+
+ ## Target Audience: Developers
+
+**PromptAlchemy** is a powerful, open-source library designed to transform basic user prompts into sophisticated prompts capable of unlocking the full potential of language models. By leveraging advanced techniques like Chain-of-Thought, Few-Shot Learning, and more, PromptAlchemy empowers developers and researchers to build more intelligent and effective applications.
+
+
+## Features
+
+- **Intuitive API**: Easily integrate PromptAlchemy into your projects with a clean and well-documented API
+- **Versatile Techniques**: Apply a range of prompt engineering strategies, including:
+    - Chain-of-Thought (CoT)
+    - Few-Shot Learning
+    - Zero-Shot Learning
+    - Task-specific prompting
+    - Multi-task prompting
+- **Customizable**: Tailor the transformation process to your specific needs.
+- **Extensible**: Easily add new prompt engineering techniques as they emerge in the field.
+- **Performance Metrics**: Built-in tools to measure and compare the effectiveness of different prompting strategies.
+
+
+## Setup
+
+### Local Development
+#### Frontend
+```bash
+cd ui/promptalchemy-ui
+
+# Build docker image
+make build
+
+# Run docker image
+make run
+```
+
+#### Backend
+```bash
+cd api
+docker build -t bmd1905/promptalchemy_local .
+docker run -it -p 30000:30000 -p 4000:4000 --env-file .env bmd1905/promptalchemy_local
+```
+
+You can then access:
+- FastAPI docs at http://localhost:30000/docs
+- LiteLLM docs at http://localhost:4000/docs
+
+### Production Deployment (GCP + K8s + CI/CD)
+
+#### Jenkins as CI
+First start Jenkins server:
+```bash
+# Port 8082
+docker compose -f docker-compose-jenkins.yaml up --build -d
+
+# Get Jenkins password
+docker exec jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Access the Jenkins server at `localhost:8082`
+
+#### Start Kubernetes Service
+Setup secret for API Key:
+```bash
+k create secret generic promptalchemy-env --from-env-file=.env --namespace promptalchemy
+k describe secret promptalchemy-env -n promptalchemy
+```
+
+Deploy using Helm:
+```bash
+cd helm_charts/promptalchemy
+helm upgrade --install promptalchemy .
+```
+
+For more detailed frontend setup instructions, please refer to `ui/promptalchemy-ui/README.md`
+
+import Emoji from 'react-emoji-render';
+
+## 📝 To-Do List
+
+### 🚀 Deployment
+- [x] Implement core features (FastAPI + LiteLLM + Redis)
+- [x] Set up CI pipeline (Jenkins)
+- [ ] Set up CD pipeline (Argo CD)
+- [ ] Optimize performance (Batching)
+- [ ] IaC (Ansible + Terraform)
+- [ ] Monitoring (Grafana + Prometheus + Jaeger + Alert)
+
+### 📚 Documentation
+- [ ] Write user guide
+- [ ] Update API documentation
+- [ ] Create tutorials and examples
+
+### 🌟 Post-Launch
+- [ ] Gather user feedback
+- [ ] Implement enhancements
+- [ ] Plan for future updates
+
+
+
+
+## Contributing
+We welcome contributions to PromptAlchemy! Please see our CONTRIBUTING.md for more information on how to get started.
+
+## License
+PromptAlchemy is released under the MIT License. See the LICENSE file for more details.
+
+
+## Citation
+If you use PromptAlchemy in your research, please cite it as follows:
+```
+@software{PromptAlchemy2024,
+  author = {Your Name},
+  title = {PromptAlchemy: Transform basic queries into sophisticated prompts},
+  year = {2024},
+  url = {https://github.com/bmd1905/PromptAlchemy}
+}
+```
+
+## Contact
+For questions, issues, or collaborations, please open an issue on our GitHub repository or contact the maintainers directly.
