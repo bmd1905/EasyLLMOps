@@ -26,18 +26,27 @@
 
 ## Setup
 
+### Docker local
+```
+docker build -t bmd1905/promptalchemy .
+docker run -p 30000:30000 --env-file .env bmd1905/promptalchemy
+```
+
 ### Jenkins as CI
 Start Jenkins server:
 ```
 # Port 8082
 docker compose -f docker-compose-jenkins.yaml up --build
+
+# Get Jenkins password
+docker exec jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 ### Manual CD (implement ArgoCD later)
 ```
 # Build
-docker build -t bmd1905/promptalchemy_test .
+docker build -t bmd1905/promptalchemy_local .
 
 # Then run
-docker run -ti -p 8001:8000 --env-file .env bmd1905/promptalchemy_test
+docker run -ti -p 30000:30000 -p 4000:4000 --env-file .env bmd1905/promptalchemy_local
 ```

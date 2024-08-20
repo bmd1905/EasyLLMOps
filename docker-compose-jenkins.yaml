@@ -1,19 +1,19 @@
-version: '3.9'
-
 volumes:
     jenkins_home:
 
 services:
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    restart: unless-stopped
-    privileged: true
-    user: root
-    ports:
-      - 8082:8080
-      - 50000:50000
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /usr/bin/docker:/usr/bin/docker
-      - /var/run/docker.sock:/var/run/docker.sock
+    jenkins:
+      build:
+        context: ./jenkins
+        dockerfile: Dockerfile
+      image: jenkins
+      container_name: jenkins-server
+      restart: unless-stopped
+      privileged: true
+      user: root
+      ports:
+        - 8082:8080
+        - 50000:50000
+      volumes:
+        - jenkins_home:/var/jenkins_home
+        - /var/run/docker.sock:/var/run/docker.sock

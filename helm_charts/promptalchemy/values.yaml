@@ -1,0 +1,4 @@
+image:
+  repository: bmd1905/promptalchemy
+  tag: "latest"
+  pullPolicy: Always
