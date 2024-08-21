@@ -63,10 +63,10 @@ response_format_map = {
 class ConversationIn(BaseModel):
     """Pydantic model for conversation input."""
 
-    message: str
-    history: List[List[str]]
+    message: str = ""
+    history: List[List[str]] = []
     prompt_type: PromptType = PromptType.ENHANCE_PROMPT
-    stream: bool = False
-    latest_prompt: str = ''
+    stream: bool = True
+    latest_prompt: str = "tell me a joke"
     model: str = 'gemini-flash'
     temperature: float = 0.0

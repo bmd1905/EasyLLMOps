@@ -18,7 +18,6 @@ app = FastAPI(
     title='Prompt Alchemy',
     description='Transforming Simple Prompts into Gold',
     version='0.1.0',
-    docs_url='/',
     redoc_url=None,
     openapi_url='/api/v1/openapi.json',
 )

@@ -38,10 +38,3 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "your-chart.fullname" . }}-env-secret
-          resources:
-            limits:
-              cpu: 4
-              memory: 2048Mi
-            requests:
-              cpu: 2
-              memory: 1024Mi

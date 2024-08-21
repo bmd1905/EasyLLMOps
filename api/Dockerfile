@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM python:3.11-slim-buster AS builder
+FROM --platform=linux/amd64 python:3.11-slim-buster AS builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -35,7 +35,7 @@ RUN poetry install --only main --no-root
 COPY . .
 
 # Stage 2: Runtime stage
-FROM python:3.11-slim-buster AS runtime
+FROM --platform=linux/amd64 python:3.11-slim-buster AS runtime
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -64,21 +64,16 @@ WORKDIR /app
 COPY --from=builder /app/.venv ./.venv
 COPY --from=builder /app .
 
-# Copy the entrypoint script and make it executable
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Install make
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    make \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN useradd -m appuser
-
-# Create logs directory and set permissions
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
-
-# Switch to non-root user
-USER appuser
+# Create logs directory
+RUN mkdir -p /app/logs
 
 # Expose ports
 EXPOSE 8000 4000 6379
 
-# Set entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+# Set entrypoint and command
+CMD ["make", "run-entrypoint"]

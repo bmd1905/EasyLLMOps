@@ -47,7 +47,7 @@ make run
 #### Backend
 ```bash
 cd api
-docker build -t bmd1905/promptalchemy_local .
+docker build -t bmd1905/promptalchemy_local --platform=linux/amd64 .
 docker run -it -p 30000:30000 -p 4000:4000 --env-file .env bmd1905/promptalchemy_local
 ```
 
@@ -61,6 +61,7 @@ You can then access:
 First start Jenkins server:
 ```bash
 # Port 8082
+cd jenkins
 docker compose -f docker-compose-jenkins.yaml up --build -d
 
 # Get Jenkins password
@@ -70,16 +71,31 @@ docker exec jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword
 Access the Jenkins server at `localhost:8082`
 
 #### Start Kubernetes Service
+
+Deploy NGINX-ingress
+```shell
+kubectl create ns nginx-system
+kubens nginx-system
+cd deployments/nginx-ingress
+helm upgrade --install nginx-ingress .
+```
+
 Setup secret for API Key:
 ```bash
+kubectl create ns promptalchemy
+kubens promptalchemy
+
+cd deployments/promptalchemy
+
 k create secret generic promptalchemy-env --from-env-file=.env --namespace promptalchemy
 k describe secret promptalchemy-env -n promptalchemy
 ```
 
-Deploy using Helm:
+Deploy model:
 ```bash
-cd helm_charts/promptalchemy
-helm upgrade --install promptalchemy .
+kubens promptalchemy
+cd deployments/promptalchemy
+helm upgrade --install promptalchemy . --debug --force
 ```
 
 For more detailed frontend setup instructions, please refer to `ui/promptalchemy-ui/README.md`
@@ -98,7 +114,6 @@ import Emoji from 'react-emoji-render';
 
 ### 📚 Documentation
 - [ ] Write user guide
-- [ ] Update API documentation
 - [ ] Create tutorials and examples
 
 ### 🌟 Post-Launch
