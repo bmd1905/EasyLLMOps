@@ -41,7 +41,7 @@ pipeline {
                 script {
                     echo 'Building Docker image...'
                     dir('api') {
-                        dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "--platform=linux/amd64 .")
                     }
                 }
             }

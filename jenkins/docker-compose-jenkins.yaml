@@ -4,7 +4,7 @@ volumes:
 services:
     jenkins:
       build:
-        context: ./jenkins
+        context: .
         dockerfile: Dockerfile
       image: jenkins
       container_name: jenkins-server
