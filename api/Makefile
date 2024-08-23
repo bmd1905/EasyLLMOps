@@ -90,5 +90,5 @@ start-standalone-server:
 .PHONY: run-entrypoint
 run-entrypoint:
 	redis-server --daemonize yes --appendonly yes --requirepass ${REDIS_PASSWORD}
-	litellm --config /app/litellm_config.yaml --port 4000 &
-	python3 -m uvicorn src.main:app --host 0.0.0.0 --port 30000
+	. .venv/bin/activate && litellm --config /app/litellm_config.yaml --port 4000 &
+	. .venv/bin/activate && python3 -m uvicorn src.main:app --host 0.0.0.0 --port 30000
