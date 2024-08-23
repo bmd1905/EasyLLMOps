@@ -173,3 +173,9 @@ api/redis-data
 
 # Alermanager
 monitoring/alertmanager_data
+
+
+# Ansible secrets
+iac/terraform/*.json
+iac/ansible/secrets/
+iac/ansible/inventory

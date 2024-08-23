@@ -22,11 +22,8 @@ kubectl create ns nginx-system
 # Switch to the nginx-system namespace
 kubens nginx-system
 
-# Navigate to the NGINX-ingress deployment directory
-cd deployments/nginx-ingress
-
 # Deploy or upgrade the NGINX-ingress using Helm
-helm upgrade --install nginx-ingress .
+helm upgrade --install nginx-ingress ./deployments/nginx-ingress
 ```
 
 This step sets up the NGINX-ingress service, which will manage external access to the services running in your Kubernetes cluster.
@@ -37,37 +34,30 @@ Next, create a Kubernetes namespace and secret to store your environment variabl
 
 ```bash
 # Create a namespace for the Prompt Alchemy application
-kubectl create ns promptalchemy
+kubectl create ns model-serving
 
 # Switch to the promptalchemy namespace
-kubens promptalchemy
+kubens model-serving
 
 # Navigate to the Prompt Alchemy deployment directory
 cd deployments/promptalchemy
 
 # Create a Kubernetes secret from the .env file to securely store environment variables
-kubectl create secret generic promptalchemy-env --from-env-file=.env --namespace promptalchemy
+kubectl create secret generic promptalchemy-env --from-env-file=.env -n model-serving
 
 # Verify that the secret has been created successfully
-kubectl describe secret promptalchemy-env -n promptalchemy
+kubectl describe secret promptalchemy-env -n model-serving
 ```
 
 This ensures that the Prompt Alchemy application can access the necessary environment variables securely.
 
 ## Deploying the Application
 
-Navigate to your Helm chart directory:
-
-```shell
-# Navigate to the directory containing the Helm chart for Prompt Alchemy
-cd deployments/promptalchemy
-```
-
 Deploy or upgrade your application using Helm:
 
-```shell
+```bash
 # Deploy or upgrade the Prompt Alchemy application using Helm with debugging and force options
-helm upgrade --install promptalchemy . --debug --force
+helm upgrade --install promptalchemy ./deployments/promptalchemy --debug --force
 ```
 
 This command will either install the application if it doesn't exist or upgrade it to the latest version if it's already deployed.
@@ -76,7 +66,7 @@ This command will either install the application if it doesn't exist or upgrade 
 
 To access your application locally, use port forwarding:
 
-```shell
+```bash
 # Forward the local port 30000 to the service's port 30000 in the Kubernetes cluster
 kubectl port-forward svc/promptalchemy 30000:30000
 ```
@@ -95,7 +85,7 @@ Your Helm chart should include the following files:
 
 You can customize the deployment by modifying the `values.yaml` file or by passing values directly to the `helm upgrade` command:
 
-```shell
+```bash
 # Deploy or upgrade the Prompt Alchemy application with a custom number of replicas
 helm upgrade --install promptalchemy . --set replicaCount=3
 ```
@@ -104,22 +94,22 @@ helm upgrade --install promptalchemy . --set replicaCount=3
 
 If you encounter issues:
 
-```shell
+```bash
 # Check the status of all pods in the promptalchemy namespace
-kubectl get pods -n promptalchemy
+kubectl get pods -n model-serving
 
 # View the logs of a specific pod (replace <pod-name> with the actual pod name)
-kubectl logs <pod-name> -n promptalchemy
+kubectl logs <pod-name> -n model-serving
 
 # Describe the detailed configuration and status of a specific pod (replace <pod-name> with the actual pod name)
-kubectl describe pod <pod-name> -n promptalchemy
+kubectl describe pod <pod-name> -n model-serving
 ```
 
 ## Uninstalling
 
 To remove the application:
 
-```shell
+```bash
 # Uninstall the Prompt Alchemy application
 helm uninstall promptalchemy
 ```

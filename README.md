@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# PromptAlchemy
+# PromptAlchemy (WIP)
 [![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
 
  Transform basic queries into sophisticated prompts for exceptional results.
@@ -30,10 +30,8 @@
 - **Performance Metrics**: Built-in tools to measure and compare the effectiveness of different prompting strategies.
 
 
-## Setup
-
-### Local Development
-#### Frontend
+## Local Development
+### Frontend
 ```bash
 cd ui/promptalchemy-ui
 
@@ -44,7 +42,7 @@ make build
 make run
 ```
 
-#### Backend
+### Backend
 ```bash
 cd api
 docker build -t bmd1905/promptalchemy_local --platform=linux/amd64 .
@@ -55,62 +53,100 @@ You can then access:
 - FastAPI docs at http://localhost:30000/docs
 - LiteLLM docs at http://localhost:4000/docs
 
-### Production Deployment (GCP + K8s + CI/CD)
+## Production Deployment
 
-#### Jenkins as CI
-First start Jenkins server:
+### Setup Cluster with Terraform
+
 ```bash
-# Port 8082
-cd jenkins
-docker compose -f docker-compose-jenkins.yaml up --build -d
+cd iac/terraform
 
-# Get Jenkins password
-docker exec jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword
+terraform init
+terraform plan
+terraform apply
 ```
 
-Access the Jenkins server at `localhost:8082`
+Get cluster info:
+```bash
+cat ~/.kube/config
+```
 
-#### Start Kubernetes Service
+### Start Service on GKE Manually
 
 Deploy NGINX-ingress
 ```shell
 kubectl create ns nginx-system
 kubens nginx-system
-cd deployments/nginx-ingress
-helm upgrade --install nginx-ingress .
+helm upgrade --install nginx-ingress ./deployments/nginx-ingress
 ```
 
 Setup secret for API Key:
 ```bash
-kubectl create ns promptalchemy
-kubens promptalchemy
+kubectl create ns model-serving
+kubens model-serving
 
 cd deployments/promptalchemy
 
-k create secret generic promptalchemy-env --from-env-file=.env --namespace promptalchemy
-k describe secret promptalchemy-env -n promptalchemy
+k create secret generic promptalchemy-env --from-env-file=.env -n model-serving
+k describe secret promptalchemy-env -n model-serving
+```
+
+Grant permission
+```bash
+cd deployments/infrastructure
+kubectl apply -f role.yaml
+kubectl apply -f rolebinding.yaml
 ```
 
 Deploy model:
 ```bash
-kubens promptalchemy
-cd deployments/promptalchemy
-helm upgrade --install promptalchemy . --debug --force
+kubens model-serving
+helm upgrade --install promptalchemy ./deployments/promptalchemy --debug --force
 ```
 
 For more detailed frontend setup instructions, please refer to `ui/promptalchemy-ui/README.md`
 
-import Emoji from 'react-emoji-render';
+### Setup Jenkins with Ansible
+First create a Google Compute Engine instance named "jenkins-server" running Ubuntu 22.04 with a firewall rule allowing traffic on ports 8081 and 50000 from any source.
+```bash
+ansible-playbook iac/ansible/deploy_jenkins/create_compute_instance.yaml
+```
+
+Then deploy Jenkins on a server by installing prerequisites, pulling a Docker image, and creating a privileged container with access to the Docker socket and exposed ports 8081 and 50000.
+
+```bash
+ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenkins.yaml
+```
+
+Connect Jenkins UI through external IP address at port 8081: http://<EXTERNAL_IP>:8081
+
+Install plugins: `Dashboard` > `Manage Jenkins` > `Plugins` > `Available Plugins` > Search for `Docker`, `Docker Pipeline`, `Kubernetes`, `GCloud SDK`, & `Google Kubernetes Engine` then click `Install`.
+
+Setup Github repo
+
+Add credential for DockerHub
+
+Add credential for GKE cluster
+
+Connect to GKE cluster
+
+```bash
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=system:anonymous
+
+kubectl create clusterrolebinding cluster-admin-default-binding --clusterrole=cluster-admin --user=system:serviceaccount:model-serving:default
+
+# Test credential
+kubectl auth can-i create pods --as=system:serviceaccount:model-serving:default
+```
 
 ## 📝 To-Do List
 
 ### 🚀 Deployment
 - [x] Implement core features (FastAPI + LiteLLM + Redis)
 - [x] Set up CI pipeline (Jenkins)
+- [x] IaC (Ansible + Terraform)
+- [ ] Monitoring (Grafana + Prometheus + Jaeger + Alert)
 - [ ] Set up CD pipeline (Argo CD)
 - [ ] Optimize performance (Batching)
-- [ ] IaC (Ansible + Terraform)
-- [ ] Monitoring (Grafana + Prometheus + Jaeger + Alert)
 
 ### 📚 Documentation
 - [ ] Write user guide

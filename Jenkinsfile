@@ -2,13 +2,8 @@ pipeline {
     agent any
 
     options {
-        // Limit the number of builds and the days to keep logs
         buildDiscarder(logRotator(numToKeepStr: '5', daysToKeepStr: '5'))
-        // Enable timestamps for each job in the pipeline
         timestamps()
-        // Fail the pipeline if any stage fails
-        disableConcurrentBuilds()
-        skipDefaultCheckout()
     }
 
     environment {
@@ -19,18 +14,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                // Check out the source code
-                checkout scm
-            }
-        }
-
         stage('Run Tests') {
             steps {
                 script {
                     echo 'Running tests...'
-                    // Assuming tests can be run with a script or command
+                    // Uncomment and adjust as needed
                     // sh './run-tests.sh'
                 }
             }
@@ -59,15 +47,28 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            when {
-                branch 'main'  // Only deploy when on the main branch
+        stage('Deploy to Google Kubernetes Engine') {
+            agent {
+                kubernetes {
+                    yaml '''
+                        apiVersion: v1
+                        kind: Pod
+                        spec:
+                          containers:
+                          - name: helm
+                            image: bmd1905/jenkins-k8s:lts-jdk17
+                            imagePullPolicy: Always
+                            command:
+                            - cat
+                            tty: true
+                    '''
+                }
             }
             steps {
                 script {
-                    echo "Deploying ${DOCKER_FULL_IMAGE}..."
-                    // Add your deployment steps here
-                    // Example: sh './deploy.sh'
+                    container('helm') {
+                        sh("helm upgrade --install promptalchemy ./deployments/promptalchemy --debug --namespace model-serving")
+                    }
                 }
             }
         }
@@ -82,13 +83,11 @@ pipeline {
         failure {
             script {
                 echo 'Build or Deployment failed!'
-                // Add any notification or cleanup steps here
             }
         }
         cleanup {
             script {
                 echo 'Cleaning up...'
-                // Optional: Clean up unused Docker images to save space
                 sh 'docker image prune -f'
             }
         }
