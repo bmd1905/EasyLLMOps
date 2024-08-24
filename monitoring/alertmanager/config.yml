@@ -1,8 +1,0 @@
-route:
-  repeat_interval: 15s # Time interval between consecutive notifications for the same alert
-  receiver: discord
-
-receivers:
-- name: discord
-  discord_configs:
-  - webhook_url: os.getenv('DISCORD_WEBHOOK_URL')
