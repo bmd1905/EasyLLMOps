@@ -158,7 +158,7 @@ helm upgrade --install -f deployments/monitoring/kube-prometheus-stack.expanded.
 - [x] Implement core features (FastAPI + LiteLLM + Redis)
 - [x] Set up CI pipeline (Jenkins)
 - [x] IaC (Ansible + Terraform)
-- [ ] Monitoring (Grafana + Prometheus + Jaeger + Alert)
+- [x] Monitoring (Grafana + Prometheus + Jaeger + Alert)
 - [ ] Set up CD pipeline (Argo CD)
 - [ ] Optimize performance (Batching)
 
