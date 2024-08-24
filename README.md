@@ -138,6 +138,20 @@ kubectl create clusterrolebinding cluster-admin-default-binding --clusterrole=cl
 kubectl auth can-i create pods --as=system:serviceaccount:model-serving:default
 ```
 
+### Setup Monitoring
+Install dependencies
+
+```bash
+cd deployments/monitoring/kube-prometheus-stack
+helm dependency build
+```
+
+Then start monitoring
+```bash
+helm upgrade --install -f deployments/monitoring/kube-prometheus-stack.expanded.yaml kube-prometheus-stack deployments/monitoring/kube-prometheus-stack -n monitoring
+```
+
+
 ## 📝 To-Do List
 
 ### 🚀 Deployment

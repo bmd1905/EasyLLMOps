@@ -1,0 +1,13 @@
+grafana:
+  env:
+    GF_SERVER_ROOT_URL: http://promptalchemy.monitoring.com/grafana
+    GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
+  # username is 'admin'
+  adminPassword: prom-operator
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+    hosts: ['promptalchemy.monitoring.com']
+    path: "/grafana"

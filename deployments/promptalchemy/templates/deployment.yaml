@@ -6,7 +6,7 @@ metadata:
     app: {{ .Release.Name }}
   namespace: model-serving
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Release.Name }}
