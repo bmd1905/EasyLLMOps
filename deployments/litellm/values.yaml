@@ -80,33 +80,70 @@ proxy_config:
   model_list:
     - model_name: gemini-flash
       litellm_params:
-        model: gemini/gemini-1.5-flash-latest
+        model: gemini/gemini-1.5-flash
         api_key: os.environ/GEMINI_API_KEY
-        rpm: 10
+        rpm: 50
 
-    # - model_name: gpt-4o-mini
+    # - model_name: codestral
     #   litellm_params:
-    #     model: openai/gpt-4o-mini
-    #     api_key: os.environ/OPENAI_API_KEY
-    #     rpm: 0
+    #     model: vertex_ai/codestral
+    #     api_key: os.environ/GEMINI_API_KEY
+    #     rpm: 50
+    #     vertex_project: "prompt-alchemy"
+    #     vertex_location: "asia-southeast1-a"
+    
+    # - model_name: gemini-embedding
+    #   litellm_params:
+    #     model: vertex_ai_beta/text-embedding-preview-0815
+    #     api_key: os.environ/GEMINI_API_KEY
+    #     rpm: 50
+    #     vertex_project: "prompt-alchemy"
+    #     vertex_location: "asia-southeast1-a"
+
+    - model_name: gpt-4o-mini
+      litellm_params:
+        model: openai/gpt-4o-mini
+        api_key: os.environ/OPENAI_API_KEY
+        rpm: 0
+
+  router_settings:
+    routing_strategy: simple-shuffle # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
+    model_group_alias: {"gpt-4o-mini": "gemini-flash"} # all requests with `gpt-4` will be routed to models with `gpt-3.5-turbo`
+    num_retries: 2
+    timeout: 30        
+    redis_host: os.environ/REDIS_HOST
+    redis_password: os.environ/REDIS_PASSWORD
+    redis_port: os.environ/REDIS_PORT
 
   litellm_settings:
-    drop_params: true
+    num_retries: 3
+    request_timeout: 15 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
+    success_callback: ["langfuse", "supabase"]
+    failure_callback: ["langfuse", "supabase"]
+    drop_params: false
     set_verbose: false
-    cache: false
+    cache: true
+    # cache_params:
+    #   type: "redis-semantic"  
+    #   similarity_threshold: 0.8   # similarity threshold for semantic cache
+    #   redis_semantic_cache_embedding_model: gemini-embedding # set this to a model_name set in model_list
+
+  environment_variables:
+    SUPABASE_URL: os.environ/SUPABASE_URL
+    SUPABASE_KEY: os.environ/SUPABASE_KEY
 
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
 
 autoscaling:
   enabled: false
