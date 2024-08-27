@@ -1,17 +1,13 @@
-
-
-<div align="center">
-
 # PromptAlchemy (WIP)
 [![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
 
  Transform basic queries into sophisticated prompts for exceptional results.
 
- </div>
+ [![Pipeline](./assets/prompt_alchemy.jpg)](#features)
 
- [![Pipeline](./assets/prompt_alchemy.png)](#features)
+## ! Please go to [here](https://bmd1905.github.io/PromptAlchemy/) to read the docs due to the heavily of the documentation)
 
- ## Target Audience: Developers
+## Target Audience: Developers
 
 This project integrates the [Open WebUI](https://github.com/open-webui/open-webui) as the backend and frontend for a machine learning operations (MLOps) environment. It includes custom-built infrastructure such as Jenkins CI/CD pipelines, Kubernetes for orchestration, deployments on Google Kubernetes Engine (GKE), etc. The project aims to provide hands-on experience with MLOps, leveraging Open WebUI’s capabilities to manage and deploy large language models (LLMs) in a scalable, cloud-native environment.
 
@@ -137,6 +133,7 @@ cd iac/terraform
 terraform init
 ```
 
+
 **Plan and Apply Configuration:**
 
   Generate an execution plan to verify the resources that Terraform will create or modify, and then apply the configuration to set up the cluster:
@@ -154,6 +151,8 @@ To interact with your GKE cluster, you'll need to retrieve its configuration. Yo
 cat ~/.kube/config
 ```
 
+![Init Cluster](assets/gifs/1-init-cluster.gif)
+
 Ensure your `kubectl` context is set correctly to manage the cluster.
 
 ### Manual Deployment to GKE
@@ -170,6 +169,10 @@ kubens nginx-system
 helm upgrade --install nginx-ingress ./deployments/nginx-ingress
 ```
 
+Please story the Nginx Ingress Controller's IP address, as you'll need it later.
+
+![Init Nginx Ingress Controller](assets/gifs/2-init-nginx-ingress-controller.gif)
+
 **2. Configure API Key Secret:**
 
 Store your environment variables, such as API keys, securely in Kubernetes secrets. Create a namespace for model serving and create a secret from your `.env` file:
@@ -182,6 +185,8 @@ kubectl create secret generic promptalchemy-env --from-env-file=.env -n model-se
 kubectl describe secret promptalchemy-env -n model-serving
 ```
 
+![Deploy Secret](assets/gifs/3-deploy-secret.gif)
+
 **3. Grant Permissions:**
 
 Kubernetes resources often require specific permissions. Apply the necessary roles and bindings:
@@ -192,7 +197,20 @@ kubectl apply -f role.yaml
 kubectl apply -f rolebinding.yaml
 ```
 
-**4. Deploy LiteLLM:**
+![Grant Permission](assets/gifs/4-grant-permission.gif)
+
+**4. Deploy caching service using Redis:**
+
+Now, deploy the semantic caching service using Redis:
+```bash
+cd ./deployments/redis
+helm dependency build
+helm upgrade --install redis .
+```
+
+![Deploy Redis](assets/gifs/5-deploy-redis.gif)
+
+**5. Deploy LiteLLM:**
 
 Deploy the [LiteLLM](https://github.com/BerriAI/litellm) service:
 
@@ -201,7 +219,9 @@ kubens model-serving
 helm upgrade --install litellm ./deployments/litellm
 ```
 
-**5. Deploy the Open WebUI:**
+![Deploy Litellm](assets/gifs/6-deploy-litellm.gif)
+
+**6. Deploy the Open WebUI:**
 
 Next, Deploy the web UI to your GKE cluster:
 
@@ -211,14 +231,13 @@ kubens model-serving
 kubectl apply -f ./kubernetes/manifest/base
 ```
 
-**6. Deploy semantic caching service using Redis:**
+![Deploy Open WebUI](assets/gifs/7-deploy-openwebui.gif)
 
-Now, deploy the semantic caching service using Redis:
-```bash
-cd ./deployments/redis
-helm dependency build
-helm upgrade --install redis .
-```
+**7. Play around with the Application:**
+
+Open browser and navigate to the URL of your GKE cluster (e.g. `http://172.0.0.0` in step 1) and add `.nip.io` to the end of the URL (e.g. `http://172.0.0.0.nip.io`). You should see the Open WebUI:
+
+![Final Web App](assets/gifs/8-final-web-app.gif)
 
 ### Continuous Integration/Continuous Deployment (CI/CD) with Jenkins and Ansible
 
