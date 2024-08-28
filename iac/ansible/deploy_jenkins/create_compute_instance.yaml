@@ -17,7 +17,7 @@
             boot: true
             initialize_params:
               source_image: projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727
-              disk_size_gb: 100
+              disk_size_gb: 50
         network_interfaces:
           - network:
               selfLink: global/networks/default

@@ -7,10 +7,10 @@ replicaCount: 1
 image:
   # Use "ghcr.io/berriai/litellm-database" for optimized image with database
   repository: ghcr.io/berriai/litellm-database
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   # tag: "main-latest"
-  tag: ""
+  tag: "main-v1.44.6-stable"
 
   # Image and tag used for the init container to check and wait for the
   #  readiness of the postgres database.
@@ -49,7 +49,8 @@ securityContext: {}
 # A list of Kubernetes Secret objects that will be exported to the LiteLLM proxy
 #  pod as environment variables.  These secrets can then be referenced in the
 #  configuration file (or "litellm" ConfigMap) with `os.environ/<Env Var Name>`
-environmentSecrets: ['promptalchemy-env']
+environmentSecrets:
+  - promptalchemy-env
 
 service:
   type: ClusterIP
@@ -78,49 +79,49 @@ ingress:
 #  Reference: https://docs.litellm.ai/docs/proxy/configs
 proxy_config:
   model_list:
-    - model_name: gemini-flash
+    - model_name: Gemini Flash
       litellm_params:
         model: gemini/gemini-1.5-flash
         api_key: os.environ/GEMINI_API_KEY
         rpm: 50
 
-    # - model_name: codestral
+    # - model_name: Gemini Pro
     #   litellm_params:
-    #     model: vertex_ai/codestral
+    #     model: gemini/gemini-1.5-pro
     #     api_key: os.environ/GEMINI_API_KEY
-    #     rpm: 50
-    #     vertex_project: "prompt-alchemy"
-    #     vertex_location: "asia-southeast1-a"
-    
-    # - model_name: gemini-embedding
-    #   litellm_params:
-    #     model: vertex_ai_beta/text-embedding-preview-0815
-    #     api_key: os.environ/GEMINI_API_KEY
-    #     rpm: 50
-    #     vertex_project: "prompt-alchemy"
-    #     vertex_location: "asia-southeast1-a"
+    #     rpm: 10
 
-    - model_name: gpt-4o-mini
+    - model_name: Llama-3.1-8b # llama-3.1-70b-versatile
+      litellm_params:
+        model: groq/llama-3.1-8b-instant
+        api_key: os.environ/GROQ_API_KEY
+        rpm: 30
+
+    - model_name: Llama-3.1-70b
+      litellm_params:
+        model: groq/llama-3.1-8b-instant
+        api_key: os.environ/GROQ_API_KEY
+        rpm: 30
+
+    - model_name: GPT-4o mini
       litellm_params:
         model: openai/gpt-4o-mini
         api_key: os.environ/OPENAI_API_KEY
         rpm: 0
 
-  router_settings:
-    routing_strategy: simple-shuffle # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
-    model_group_alias: {"gpt-4o-mini": "gemini-flash"} # all requests with `gpt-4` will be routed to models with `gpt-3.5-turbo`
-    num_retries: 2
-    timeout: 30        
-    redis_host: os.environ/REDIS_HOST
-    redis_password: os.environ/REDIS_PASSWORD
-    redis_port: os.environ/REDIS_PORT
-
   litellm_settings:
     num_retries: 3
-    request_timeout: 15 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
-    success_callback: ["langfuse", "supabase"]
-    failure_callback: ["langfuse", "supabase"]
-    drop_params: false
+    request_timeout: 15 # raise Timeout error if call takes longer than 15s. Sets litellm.request_timeout
+    fallbacks: [
+      {"Llama-3.1-8b": ["Gemini Flash"]},
+      {"Llama-3.1-70b": ["Gemini Flash"]},
+      {"GPT-4o mini": ["Gemini Flash"]},
+    ]
+    allowed_fails: 3 # cooldown model if it fails > 1 call in a minute. 
+    cooldown_time: 30 # how long to cooldown model if fails/min > allowed_fails
+    success_callback: ["langfuse"] #, "supabase"]
+    failure_callback: ["langfuse"] #, "supabase"]
+    drop_params: true
     set_verbose: false
     cache: true
     # cache_params:
@@ -128,10 +129,21 @@ proxy_config:
     #   similarity_threshold: 0.8   # similarity threshold for semantic cache
     #   redis_semantic_cache_embedding_model: gemini-embedding # set this to a model_name set in model_list
 
-  environment_variables:
-    SUPABASE_URL: os.environ/SUPABASE_URL
-    SUPABASE_KEY: os.environ/SUPABASE_KEY
+  router_settings:
+    routing_strategy: simple-shuffle # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
+    model_group_alias: {"GPT-4o mini": "Gemini Flash"} # all requests with `gpt-4` will be routed to models with `gpt-3.5-turbo`
+    num_retries: 2
+    timeout: 30        
+    redis_host: os.environ/REDIS_HOST
+    redis_password: os.environ/REDIS_PASSWORD
+    redis_port: os.environ/REDIS_PORT
 
+  # environment_variables:
+  #   SUPABASE_URL: os.environ/SUPABASE_URL
+  #   SUPABASE_KEY: os.environ/SUPABASE_KEY
+  #   redis_host: os.environ/REDIS_HOST
+  #   redis_password: os.environ/REDIS_PASSWORD
+  #   redis_port: os.environ/REDIS_PORT
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -139,8 +151,8 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 200m
+    memory: 256Mi
   limits:
     cpu: 1000m
     memory: 1Gi

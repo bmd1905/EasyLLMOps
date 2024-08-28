@@ -8,5 +8,5 @@ variable "project_id" {
 
 variable "region" {
   description = "The region the cluster in"
-  default     = "asia-southeast1-a" # To increase quota limits
+  default     = "asia-southeast1-a"
 }

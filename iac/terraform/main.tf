@@ -14,7 +14,6 @@ terraform {
 // managing the infrastructure in GCP, this will
 // apply to all the resources in the project
 provider "google" {
-  credentials = "./prompt-alchemy-1935af3ba5e8.json"
   project = var.project_id
   region  = var.region
 }
@@ -28,11 +27,11 @@ resource "google_container_cluster" "primary" {
   enable_autopilot = false
 
   // Specify the initial number of nodes
-  initial_node_count = 1
+  initial_node_count = 2
 
   // Node configuration
   node_config {
-    machine_type = "e2-medium" // 2 vCPUs, 4 GB memory
+    machine_type = "e2-highcpu-4" // 4 vCPUs, 4 GB RAM
     disk_size_gb = 30
   }
 }

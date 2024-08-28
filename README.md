@@ -245,29 +245,27 @@ For automated CI/CD pipelines, use Jenkins and Ansible as follows:
 
 **1. Set up Jenkins Server:**
 
-Create a Google Compute Engine instance for Jenkins. Ensure it's accessible on the necessary ports:
+First create a Google Compute Engine instance named "jenkins-server" running Ubuntu 22.04 with a firewall rule allowing traffic on ports 8081 and 50000 from any source.
 
-- **Instance Name:** jenkins-server
-- **OS:** Ubuntu 22.04
-- **Ports:** Allow traffic on 8081 (Jenkins UI) and 50000 (Jenkins agent).
+```bash
+ansible-playbook iac/ansible/deploy_jenkins/create_compute_instance.yaml
+```
 
-**2. Deploy Jenkins:**
-
-Use Ansible to automate the deployment of Jenkins on your instance:
+Deploy Jenkins on a server by installing prerequisites, pulling a Docker image, and creating a privileged container with access to the Docker socket and exposed ports 8081 and 50000.
 
 ```bash
 ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenkins.yaml
 ```
 
-**3. Access Jenkins:**
+**2. Access Jenkins:**
 
 Once Jenkins is deployed, access it via your browser:
-
+ 
 ```plaintext
 http://<EXTERNAL_IP>:8081
 ```
 
-**4. Install Jenkins Plugins:**
+**3. Install Jenkins Plugins:**
 
 Install the following plugins to integrate Jenkins with Docker, Kubernetes, and GKE:
 
@@ -277,7 +275,7 @@ Install the following plugins to integrate Jenkins with Docker, Kubernetes, and 
 - GCloud SDK
 - Google Kubernetes Engine
 
-**5. Configure Jenkins:**
+**4. Configure Jenkins:**
 
 Set up your GitHub repository in Jenkins, and add the necessary credentials for DockerHub and GKE.
 
