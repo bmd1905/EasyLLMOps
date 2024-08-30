@@ -1,3 +1,4 @@
 [submodule "open-webui"]
 	path = open-webui
 	url = https://github.com/bmd1905/open-webui
+	branch = bmd1905/promptalchemy-main

@@ -7,7 +7,7 @@
         machine_type: e2-medium
         # Refer to https://cloud.google.com/compute/docs/images/os-details#ubuntu_lts
         # or use the command `gcloud compute images list --project=ubuntu-os-cloud`
-        zone: asia-southeast1-a
+        zone: asia-southeast1-b
         project: prompt-alchemy
         # The service account is needed to create the resources
         auth_kind: serviceaccount
@@ -17,7 +17,7 @@
             boot: true
             initialize_params:
               source_image: projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727
-              disk_size_gb: 100
+              disk_size_gb: 50
         network_interfaces:
           - network:
               selfLink: global/networks/default

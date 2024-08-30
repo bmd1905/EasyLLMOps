@@ -7,10 +7,11 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = 'bmd1905/promptalchemy'
+        DOCKER_IMAGE = 'bmd1905/open-webui'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         DOCKER_FULL_IMAGE = "${DOCKER_IMAGE}:${DOCKER_TAG}"
         DOCKER_REGISTRY_CREDENTIAL = 'dockerhub'
+        WEBUI_DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -27,9 +28,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image...'
-                    dir('api') {
-                        dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "--platform=linux/amd64 .")
+                    echo 'Building Docker image using Docker Compose...'
+                    dir('open-webui') {
+                        sh "WEBUI_DOCKER_TAG=${env.BUILD_NUMBER} docker compose -f docker-compose.yaml build"
                     }
                 }
             }
@@ -40,8 +41,8 @@ pipeline {
                 script {
                     echo 'Pushing Docker image to the registry...'
                     docker.withRegistry('', DOCKER_REGISTRY_CREDENTIAL) {
-                        dockerImage.push()
-                        dockerImage.push('latest')
+                        docker.image("${DOCKER_FULL_IMAGE}").push()
+                        docker.image("${DOCKER_FULL_IMAGE}").push('latest')
                     }
                 }
             }
@@ -67,7 +68,8 @@ pipeline {
             steps {
                 script {
                     container('helm') {
-                        sh("helm upgrade --install promptalchemy ./deployments/promptalchemy --debug --namespace model-serving")
+                        sh("chmod +x ./cluster.sh")
+                        sh("./cluster.sh")
                     }
                 }
             }
