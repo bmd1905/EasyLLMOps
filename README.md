@@ -259,11 +259,26 @@ ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenk
 
 **2. Access Jenkins:**
 
+We need to find the Jenkins server password to be able to access the server. First, access the Jenkins server:
+
+```bash
+ssh <USERNAME>:<EXTERNAL_IP>
+```
+
+Then run the following command to get the password:
+
+```bash
+sudo docker exec -it jenkins bash
+cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
 Once Jenkins is deployed, access it via your browser:
  
 ```plaintext
 http://<EXTERNAL_IP>:8081
 ```
+
+Get password
 
 **3. Install Jenkins Plugins:**
 
