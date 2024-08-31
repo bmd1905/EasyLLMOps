@@ -5,7 +5,7 @@
 
  [![Pipeline](./assets/prompt_alchemy.jpg)](#features)
 
-## ! Please go to [here](https://bmd1905.github.io/PromptAlchemy/) to read the docs due to the heavily of the documentation)
+## Please go to [here](https://bmd1905.github.io/PromptAlchemy/) to read the docs due to the heavily of the documentation)
 
 ## Target Audience: Developers
 
@@ -227,8 +227,7 @@ Next, Deploy the web UI to your GKE cluster:
 
 ```bash
 cd open-webui
-kubens model-serving
-kubectl apply -f ./kubernetes/manifest/base
+kubectl apply -f ./kubernetes/manifest/base -n model-serving
 ```
 
 ![Deploy Open WebUI](assets/gifs/7-deploy-openwebui.gif)
@@ -245,7 +244,9 @@ For automated CI/CD pipelines, use Jenkins and Ansible as follows:
 
 **1. Set up Jenkins Server:**
 
-First create a Google Compute Engine instance named "jenkins-server" running Ubuntu 22.04 with a firewall rule allowing traffic on ports 8081 and 50000 from any source.
+First, create a Service Account and assign it the `Compute Admin` role. Then create a Json key file for the Service Account and store it in the `iac/ansible/secrets` directory.
+
+Next create a Google Compute Engine instance named "jenkins-server" running Ubuntu 22.04 with a firewall rule allowing traffic on ports 8081 and 50000.
 
 ```bash
 ansible-playbook iac/ansible/deploy_jenkins/create_compute_instance.yaml
@@ -257,7 +258,19 @@ Deploy Jenkins on a server by installing prerequisites, pulling a Docker image, 
 ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenkins.yaml
 ```
 
+![Create Ansible secrets](assets/gifs/9-create-ansible-secrets.gif)
+
 **2. Access Jenkins:**
+
+To access the Jenkins server through SSH, we need to create a public/private key pair. Run the following command to create a key pair:
+
+```bash
+ssh-keygen
+```
+
+Open `Metadata` and copy the `ssh-keys` value.
+
+![Create SSH key pair](assets/gifs/10-setup-ssh-key.gif)
 
 We need to find the Jenkins server password to be able to access the server. First, access the Jenkins server:
 
@@ -268,9 +281,11 @@ ssh <USERNAME>:<EXTERNAL_IP>
 Then run the following command to get the password:
 
 ```bash
-sudo docker exec -it jenkins bash
+sudo docker exec -it jenkins-server bash
 cat /var/jenkins_home/secrets/initialAdminPassword
 ```
+
+![Get Jenkins password](assets/gifs/11-get-jenkins-password.gif)
 
 Once Jenkins is deployed, access it via your browser:
  
@@ -278,7 +293,7 @@ Once Jenkins is deployed, access it via your browser:
 http://<EXTERNAL_IP>:8081
 ```
 
-Get password
+![Access Jenkins](assets/gifs/12-access-jenkins-server.gif)
 
 **3. Install Jenkins Plugins:**
 
@@ -287,53 +302,179 @@ Install the following plugins to integrate Jenkins with Docker, Kubernetes, and 
 - Docker
 - Docker Pipeline
 - Kubernetes
-- GCloud SDK
 - Google Kubernetes Engine
+
+After installing the plugins, restart Jenkins.
+
+```bash
+sudo docker restart jenkins-server
+```
+
+![Install Jenkins Plugins](assets/gifs/13-install-plugins.gif)
 
 **4. Configure Jenkins:**
 
-Set up your GitHub repository in Jenkins, and add the necessary credentials for DockerHub and GKE.
+4.1. Add webhooks to your GitHub repository to trigger Jenkins builds.
 
-### Monitoring with Prometheus
+Go to the GitHub repository and click on `Settings`. Click on `Webhooks` and then click on `Add Webhook`. Enter the URL of your Jenkins server (e.g. `http://<EXTERNAL_IP>:8081/github-webhook/`). Then click on `Let me select individual events` and select `Let me select individual events`. Select `Push` and `Pull Request` and click on `Add Webhook`.
 
-To monitor your deployed application, follow these steps:
+![Add webhooks to GitHub repository](assets/gifs/14-add-webhooks.gif)
 
-**1. Install Dependencies:**
+4.2. Add Github repository as a Jenkins source code repository.
+
+Go to Jenkins dashboard and click on `New Item`. Enter a name for your project (e.g. `prompt-alchemy`) and select `Multibranch Pipeline`. Click on `OK`. Click on `Configure` and then click on `Add Source`. Select `GitHub` and click on `Add`. Enter the URL of your GitHub repository (e.g. `https://github.com/bmd1905/PromptAlchemy`). In the `Credentials` field, select `Add` and select `Username with password`. Enter your GitHub username and password (or use a personal access token). Click on `Test Connection` and then click on `Save`.
+
+![Add Github repository as a Jenkins source code repository](assets/gifs/15-add-github-repo.gif)
+
+4.3. Setup docker hub credentials.
+
+First, create a Docker Hub account. Go to the Docker Hub website and click on `Sign Up`. Enter your username and password. Click on `Sign Up`. Click on `Create Repository`. Enter a name for your repository (e.g. `prompt-alchemy`) and click on `Create`.
+
+From Jenkins dashboard, go to `Manage Jenkins` > `Credentials`. Click on `Add Credentials`. Select `Username with password` and click on `Add`. Enter your Docker Hub username, access token, and set `ID` to `dockerhub`.
+
+![Setup docker hub credentials](assets/gifs/16-setup-dockerhub-credentials.gif)
+
+4.4. Setup Kubernetes credentials.
+
+First, create a Service Account for the Jenkins server to access the GKE cluster. Go to the GCP console and navigate to IAM & Admin > Service Accounts. Create a new service account with the `Kubernetes Engine Admin` role. Give the service account a name and description. Click on the service account and then click on the `Keys` tab. Click on `Add Key` and select `JSON` as the key type. Click on `Create` and download the JSON file.
+
+![Setup Kubernetes credentials](assets/gifs/17-setup-kubernetes-credentials.gif)
+
+Then, from Jenkins dashboard, go to `Manage Jenkins` > `Cloud`. Click on `New cloud`. Select `Kubernetes`. Enter the name of your cluster (e.g. `gke-prompt-alchemy-cluster-1), enter the URL and Certificate from your GKE cluster. In the `Kubernetes Namespace`, enter the namespace of your cluster (e.g. `model-serving`). In the `Credentials` field, select `Add` and select `Google Service Account from private`. Enter your project-id and the path to the JSON file.
+
+![Setup Kubernetes credentials](assets/gifs/18-setup-kubernetes-credentials.gif)
+
+**5. Test the setup:**
+
+Push a new commit to your GitHub repository. You should see a new build in Jenkins.
+
+![Test the setup](assets/gifs/19-test-cicd.gif)
+
+
+### Monitoring with Prometheus and Grafana
+
+**1. Create Discord webhook:**
+
+First, create a Discord webhook. Go to the Discord website and click on `Server Settings`. Click on `Integrations`. Click on `Create Webhook`. Enter a name for your webhook (e.g. `prompt-alchemy-discord-webhook`) and click on `Create`. Copy the webhook URL.
+
+![Create Discord webhook](assets/gifs/20-create-discord-webhook.gif)
+
+
+**2. Configure Helm Repositories**
+
+First, we need to add the necessary Helm repositories for Prometheus and Grafana:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+```
+
+These commands add the official Prometheus and Grafana Helm repositories and update your local Helm chart information.
+
+**3. Install Dependencies**
 
 Prometheus requires certain dependencies that can be managed with Helm. Navigate to the monitoring directory and build these dependencies:
 
 ```bash
-cd deployments/monitoring/kube-prometheus-stack
-helm dependency build
+helm dependency build ./deployments/monitoring/kube-prometheus-stack
 ```
 
-**2. Deploy Prometheus:**
+**4. Deploy Prometheus**
 
-Deploy Prometheus and its associated services using Helm:
+Now, we'll deploy Prometheus and its associated services using Helm:
 
 ```bash
+kubectl create namespace monitoring
 helm upgrade --install -f deployments/monitoring/kube-prometheus-stack.expanded.yaml kube-prometheus-stack deployments/monitoring/kube-prometheus-stack -n monitoring
 ```
 
-This setup will provide monitoring capabilities for your Kubernetes cluster, ensuring you can track performance and troubleshoot issues.
+This command does the following:
+- `helm upgrade --install`: This will install Prometheus if it doesn't exist, or upgrade it if it does.
+- `-f deployments/monitoring/kube-prometheus-stack.expanded.yaml`: This specifies a custom values file for configuration.
+- `kube-prometheus-stack`: This is the release name for the Helm installation.
+- `deployments/monitoring/kube-prometheus-stack`: This is the chart to use for installation.
+- `-n monitoring`: This specifies the namespace to install into.
 
+![Deploy Prometheus](assets/gifs/21-start-monitoring-services.gif)
 
-## 📝 To-Do List
+By default, the services are not exposed externally. To access them, you can use port-forwarding:
 
-### 🚀 Deployment
-- [x] Implement core features
-- [x] Set up CI pipeline (Jenkins)
-- [x] IaC (Ansible + Terraform)
-- [x] Monitoring (Grafana + Prometheus + Alert)
-- [x] Caching chatbot responses (Redis)
-- [ ] Tracing (Jaeger)
-- [ ] Set up CD pipeline (Argo CD)
-- [ ] Optimize performance (Batching)
+For Prometheus:
+```bash
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+```
+Then access Prometheus at `http://localhost:9090`
 
-### 🌟 Post-Launch
-- [ ] Create tutorials and examples
-- [ ] Gather user feedback
-- [ ] Implement enhancements
+For Grafana:
+```bash
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80
+```
+Then access Grafana at `http://localhost:3000`
+
+The default credentials for Grafana are usually:
+- Username: admin
+- Password: prom-operator (you should change this immediately)
+
+![Access Prometheus and Grafana](assets/gifs/22-access-prom-graf.gif)
+
+**5. Test Alerting**
+
+First we need to create a sample alert. Navigate to the `monitoring` directory and run the following command:
+
+```bash
+kubectl port-forward -n monitoring svc/alertmanager-operated 9093:9093
+```
+
+Then, in a new terminal, run the following command:
+
+```bash
+curl -XPOST -H "Content-Type: application/json" -d '[
+  {
+    "labels": {
+      "alertname": "DiskSpaceLow",
+      "severity": "critical",
+      "instance": "server02",
+      "job": "node_exporter",
+      "mountpoint": "/data"
+    },
+    "annotations": {
+      "summary": "Disk space critically low",
+      "description": "Server02 has only 5% free disk space on /data volume"
+    },
+    "startsAt": "2023-09-01T12:00:00Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=node_filesystem_free_bytes+%2F+node_filesystem_size_bytes+%2A+100+%3C+5"
+  },
+  {
+    "labels": {
+      "alertname": "HighMemoryUsage",
+      "severity": "warning",
+      "instance": "server03",
+      "job": "node_exporter"
+    },
+    "annotations": {
+      "summary": "High memory usage detected",
+      "description": "Server03 is using over 90% of its available memory"
+    },
+    "startsAt": "2023-09-01T12:05:00Z",
+    "generatorURL": "http://prometheus.example.com/graph?g0.expr=node_memory_MemAvailable_bytes+%2F+node_memory_MemTotal_bytes+%2A+100+%3C+10"
+  }
+]' http://localhost:9093/api/v2/alerts
+```
+
+This command creates a sample alert. You can verify that the alert was created by running the following command:
+
+```bash
+curl http://localhost:9093/api/v2/status
+```
+
+Or, you can manually check the Discord channel.
+
+![Discord alert](assets/gifs/23-discord-alert.gif)
+
+---
+
+This setup provides comprehensive monitoring capabilities for your Kubernetes cluster. With Prometheus collecting metrics and Grafana visualizing them, you can effectively track performance, set up alerts for potential issues, and gain valuable insights into your infrastructure and applications.
 
 ## Contributing
 We welcome contributions to PromptAlchemy! Please see our CONTRIBUTING.md for more information on how to get started.

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open-webui-deployment
+  namespace: model-serving
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: open-webui
+  template:
+    metadata:
+      labels:
+        app: open-webui
+    spec:
+      containers:
+      - name: open-webui
+        image: bmd1905/open-webui:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "500Mi"
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+        env:
+        - name: OPENAI_API_BASE_URL
+          value: "http://litellm.model-serving.svc.cluster.local:4000"
+        - name: OPENAI_API_KEY
+          value: "anything"
+        tty: true
+        volumeMounts:
+        - name: webui-volume
+          mountPath: /app/backend/data
+      volumes:
+      - name: webui-volume
+        persistentVolumeClaim:
+          claimName: open-webui-pvc          

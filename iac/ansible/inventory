@@ -1,2 +1,2 @@
 [servers]
-35.240.191.221 ansible_ssh_private_key_file=/Users/bmd1905/.ssh/id_ed25519
+34.121.184.104 ansible_ssh_private_key_file=/Users/bmd1905/.ssh/id_ed25519

@@ -4,14 +4,14 @@
     - name: Start an instance
       gcp_compute_instance:
         name: jenkins-server
-        machine_type: e2-medium
+        machine_type: e2-standard-2
         # Refer to https://cloud.google.com/compute/docs/images/os-details#ubuntu_lts
         # or use the command `gcloud compute images list --project=ubuntu-os-cloud`
-        zone: asia-southeast1-b
+        zone: us-central1-a
         project: prompt-alchemy
         # The service account is needed to create the resources
         auth_kind: serviceaccount
-        service_account_file: ../secrets/prompt-alchemy-088144947091.json
+        service_account_file: ../secrets/prompt-alchemy-d32063c4c41d.json
         disks:
           - auto_delete: true
             boot: true
@@ -42,4 +42,4 @@
         description: Allow incoming traffic on port 30000
         project: prompt-alchemy
         auth_kind: serviceaccount
-        service_account_file: ../secrets/prompt-alchemy-088144947091.json
+        service_account_file: ../secrets/prompt-alchemy-d32063c4c41d.json

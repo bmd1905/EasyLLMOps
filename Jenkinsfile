@@ -68,8 +68,7 @@ pipeline {
             steps {
                 script {
                     container('helm') {
-                        sh("chmod +x ./cluster.sh")
-                        sh("./cluster.sh")
+                        sh("kubectl apply -f ./open-webui/kubernetes/manifest/base -n model-serving")
                     }
                 }
             }
