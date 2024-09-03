@@ -1,126 +1,35 @@
 # PromptAlchemy (WIP)
 [![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
 
- Transform basic queries into sophisticated prompts for exceptional results.
+MLOps for LLMs, Simplified: PromptAlchemy Takes the Complexity Out.
 
  [![Pipeline](./assets/prompt_alchemy.jpg)](#features)
 
-## Please go to [here](https://bmd1905.github.io/PromptAlchemy/) to read the docs due to the heavily of the documentation)
+## Introduction
 
-## Target Audience: Developers
+PromptAlchemy is a project built with Open WebUI that can be deployed on Google Kubernetes Engine (GKE) for managing and scaling language models. It offers both Terraform and manual deployment methods, and incorporates robust MLOps practices. This includes CI/CD pipelines with Jenkins and Ansible for automation, monitoring with Prometheus and Grafana for performance insights, and centralized logging with the ELK stack for troubleshooting and analysis. Developers can find detailed documentation and instructions on the project's website.
 
-This project integrates the [Open WebUI](https://github.com/open-webui/open-webui) as the backend and frontend for a machine learning operations (MLOps) environment. It includes custom-built infrastructure such as Jenkins CI/CD pipelines, Kubernetes for orchestration, deployments on Google Kubernetes Engine (GKE), etc. The project aims to provide hands-on experience with MLOps, leveraging Open WebUI’s capabilities to manage and deploy large language models (LLMs) in a scalable, cloud-native environment.
+## Features
 
+- **Ease of Use**: EasyLLMOps provides an intuitive interface and streamlined workflows that make managing LLMs simple and efficient, regardless of your experience level.
+- **Scalability & Flexibility**: Scale your LLM deployments effortlessly, adapt to evolving needs, and integrate seamlessly with your existing infrastructure.
+- **Reduced Complexity**: Eliminate the hassle of complex configurations and infrastructure management, allowing you to focus on building and deploying powerful LLM applications.
+- **Enhanced Productivity**: Accelerate your LLM development lifecycle, optimize performance, and maximize the impact of your language models.
 
-## Key Features of Open WebUI ⭐ (from [@open-webui/open-webui](https://github.com/open-webui/open-webui))
+## Target Audience
 
-- 🚀 **Effortless Setup**: Install seamlessly using Docker or Kubernetes (kubectl, kustomize or helm) for a hassle-free experience with support for both `:ollama` and `:cuda` tagged images.
-
-- 🤝 **Ollama/OpenAI API Integration**: Effortlessly integrate OpenAI-compatible APIs for versatile conversations alongside Ollama models. Customize the OpenAI API URL to link with **LMStudio, GroqCloud, Mistral, OpenRouter, and more**.
-
-- 🧩 **Pipelines, Open WebUI Plugin Support**: Seamlessly integrate custom logic and Python libraries into Open WebUI using [Pipelines Plugin Framework](https://github.com/open-webui/pipelines). Launch your Pipelines instance, set the OpenAI URL to the Pipelines URL, and explore endless possibilities. [Examples](https://github.com/open-webui/pipelines/tree/main/examples) include **Function Calling**, User **Rate Limiting** to control access, **Usage Monitoring** with tools like Langfuse, **Live Translation with LibreTranslate** for multilingual support, **Toxic Message Filtering** and much more.
-
-- 📱 **Responsive Design**: Enjoy a seamless experience across Desktop PC, Laptop, and Mobile devices.
-
-- 📱 **Progressive Web App (PWA) for Mobile**: Enjoy a native app-like experience on your mobile device with our PWA, providing offline access on localhost and a seamless user interface.
-
-- ✒️🔢 **Full Markdown and LaTeX Support**: Elevate your LLM experience with comprehensive Markdown and LaTeX capabilities for enriched interaction.
-
-- 🎤📹 **Hands-Free Voice/Video Call**: Experience seamless communication with integrated hands-free voice and video call features, allowing for a more dynamic and interactive chat environment.
-
-- 🛠️ **Model Builder**: Easily create Ollama models via the Web UI. Create and add custom characters/agents, customize chat elements, and import models effortlessly through [Open WebUI Community](https://openwebui.com/) integration.
-
-- 🐍 **Native Python Function Calling Tool**: Enhance your LLMs with built-in code editor support in the tools workspace. Bring Your Own Function (BYOF) by simply adding your pure Python functions, enabling seamless integration with LLMs.
-
-- 📚 **Local RAG Integration**: Dive into the future of chat interactions with groundbreaking Retrieval Augmented Generation (RAG) support. This feature seamlessly integrates document interactions into your chat experience. You can load documents directly into the chat or add files to your document library, effortlessly accessing them using the `#` command before a query.
-
-- 🔍 **Web Search for RAG**: Perform web searches using providers like `SearXNG`, `Google PSE`, `Brave Search`, `serpstack`, `serper`, `Serply`, `DuckDuckGo` and `TavilySearch` and inject the results directly into your chat experience.
-
-- 🌐 **Web Browsing Capability**: Seamlessly integrate websites into your chat experience using the `#` command followed by a URL. This feature allows you to incorporate web content directly into your conversations, enhancing the richness and depth of your interactions.
-
-- 🎨 **Image Generation Integration**: Seamlessly incorporate image generation capabilities using options such as AUTOMATIC1111 API or ComfyUI (local), and OpenAI's DALL-E (external), enriching your chat experience with dynamic visual content.
-
-- ⚙️ **Many Models Conversations**: Effortlessly engage with various models simultaneously, harnessing their unique strengths for optimal responses. Enhance your experience by leveraging a diverse set of models in parallel.
-
-- 🔐 **Role-Based Access Control (RBAC)**: Ensure secure access with restricted permissions; only authorized individuals can access your Ollama, and exclusive model creation/pulling rights are reserved for administrators.
-
-- 🌐🌍 **Multilingual Support**: Experience Open WebUI in your preferred language with our internationalization (i18n) support. Join us in expanding our supported languages! We're actively seeking contributors!
-
-- 🌟 **Continuous Updates**: We are committed to improving Open WebUI with regular updates, fixes, and new features.
+Developers building and deploying LLM-powered applications.
+Data scientists and machine learning engineers working with LLMs.
+DevOps teams responsible for managing LLM infrastructure.
+Organizations looking to integrate LLMs into their operations.
 
 ## Getting Started
 
-### Local Development
-
-**1. Clone the Repository:**
-
-First, you'll need to clone the project's repository from GitHub to your local machine. This will create a copy of the codebase in a directory named `PromptAlchemy`.
-
+In case you don't want to spend much time, please run this script and enjoy your coffee:
 ```bash
-git clone https://github.com/bmd1905/PromptAlchemy.git
-cd PromptAlchemy
+chmod +x ./cluster.sh
+./cluster.sh
 ```
-
-**2. Backend Setup:**
-
-To set up the backend, follow these steps:
-
-- **(Optional) Conda Environment:**
-
-  It's recommended to use a Conda environment to manage dependencies and avoid conflicts with other Python projects. If you don't have Conda installed, you can install it by following the instructions on the [Anaconda website](https://docs.anaconda.com/anaconda/install/).
-
-  ```bash
-  conda create --name open-webui-env python=3.11
-  conda activate open-webui-env
-  ```
-
-- **Install Dependencies:**
-
-  Install the required Python packages using `pip`. The `-r requirements.txt` option ensures all dependencies listed in the `requirements.txt` file are installed. The `-U` flag is used to upgrade packages to the latest version if possible.
-
-  ```bash
-  pip install -r requirements.txt -U
-  ```
-
-- **Start the Backend Server:**
-
-  After installing the dependencies, you can start the backend server using the provided script. This script will launch the server, making it ready to handle API requests.
-
-  ```bash
-  bash start.sh
-  ```
-
-**3. Frontend Setup:**
-
-The frontend of the application is located in the `open-webui` directory. To set it up, navigate to the directory and install the necessary dependencies:
-
-```bash
-cd open-webui
-npm install
-```
-
-- **Build and Run the Frontend:**
-
-  Once the dependencies are installed, build the frontend assets and start the development server:
-
-  ```bash
-  npm run build
-  npm run dev
-  ```
-
-  The development server will host the frontend, allowing you to interact with the application via a web browser.
-
-**4. Configuration:**
-
-To configure the application, you'll need to set up environment variables. The `.env.example` file contains example configurations. Copy this file to `.env` and fill in the required variables, such as API keys for language models.
-
-```bash
-cp -RPp .env.example .env
-```
-
-Edit the `.env` file with your specific configuration details, ensuring that all required environment variables are set.
-
-## Production Deployment
 
 ### Using Terraform for Google Kubernetes Engine (GKE)
 
@@ -476,37 +385,97 @@ Or, you can manually check the Discord channel.
 
 This setup provides comprehensive monitoring capabilities for your Kubernetes cluster. With Prometheus collecting metrics and Grafana visualizing them, you can effectively track performance, set up alerts for potential issues, and gain valuable insights into your infrastructure and applications.
 
-### Logging with Fluent Bit + ElaSticsearch + Kibana
+### Logging with Filebeat + Logstash + Elasticsearch + Kibana
 
-First, create a namepsace for logging:
+Centralized logging is essential for monitoring and troubleshooting applications deployed on Kubernetes. This section guides you through setting up an ELK stack (Elasticsearch, Logstash, Kibana) with Filebeat for logging your GKE cluster.
+
+**0. Quick run**
+
+You can use this single bash script to kick off the ELK stack:
+
+```bash
+cd ELK
+chmod +x ./run.sh
+./run.sh
+```
+
+**1. Install ELK Stack with Helm**
+
+We will use Helm to deploy the ELK stack components:
+
+- **Elasticsearch:** Stores the logs.
+- **Logstash:** Processes and filters the logs.
+- **Kibana:** Provides a web UI for visualizing and searching logs.
+- **Filebeat:** Collects logs from your pods and forwards them to Logstash.
+
+First, create a namespace for the logging components:
 
 ```bash
 kubectl create ns logging
+kubens logging
 ```
 
-**1. Install Fluent Bit**
+Next, install Elasticsearch:
 
 ```bash
-helm upgrade --install -f ./deployments/monitoring/fluent-bit.expanded.yaml fluent-bit ./deployments/monitoring/fluent-bit -n logging
+helm install elk-elasticsearch elastic/elasticsearch -f deployments/ELK/elastic.expanded.yaml --namespace logging --create-namespace
 ```
 
-
-**2. Install Elasticsearch**
+Wait for Elasticsearch to be ready:
 
 ```bash
-helm upgrade --install -f ./deployments/monitoring/elasticsearch.expanded.yaml elasticsearch ./deployments/monitoring/elasticsearch -n logging
+echo "Waiting for Elasticsearch to be ready..."
+kubectl wait --for=condition=ready pod -l app=elasticsearch-master --timeout=300s
 ```
 
-**3. Install Kibana**
+Create a secret for Logstash to access Elasticsearch:
 
 ```bash
-helm upgrade --install -f ./deployments/monitoring/kibana.expanded.yaml kibana ./deployments/monitoring/kibana -n logging
+kubectl create secret generic logstash-elasticsearch-credentials \
+  --from-literal=username=elastic \
+  --from-literal=password=$(kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d)
 ```
+
+Install Kibana:
 
 ```bash
-kubectl apply -f ./deployments/monitoring/kibana-simple
+helm install elk-kibana elastic/kibana -f deployments/ELK/kibana.expanded.yaml
 ```
 
+Install Logstash:
+
+```bash
+helm install elk-logstash elastic/logstash -f deployments/ELK/logstash.expanded.yaml
+```
+
+Install Filebeat:
+
+```bash
+helm install elk-filebeat elastic/filebeat -f deployments/ELK/filebeat.expanded.yaml
+```
+
+![Deploy ELK](assets/gifs/24-deploy-elk.gif)
+
+**2. Access Kibana:**
+
+Expose Kibana using a service and access it through your browser:
+
+```bash
+kubectl port-forward -n logging svc/elk-kibana-kibana 5601:5601
+```
+
+Please use this script to get the Kibana password:
+```bash
+kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d
+```
+
+Open your browser and navigate to `http://localhost:5601`.
+
+**3. Verify Log Collection**
+
+You should now be able to see logs from your Kubernetes pods in Kibana. You can create dashboards and visualizations to analyze your logs and gain insights into your application's behavior.
+
+![Access Kibana](assets/gifs/25-access-kibana.gif)
 
 ## Contributing
 We welcome contributions to PromptAlchemy! Please see our CONTRIBUTING.md for more information on how to get started.

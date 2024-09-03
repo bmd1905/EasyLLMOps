@@ -301,9 +301,9 @@ main() {
     deploy_nginx_ingress
     configure_api_key_secret
     grant_permissions
-    # deploy_redis
-    # deploy_litellm
-    # deploy_open_webui
+    deploy_redis
+    deploy_litellm
+    deploy_open_webui
 
     success "Cluster setup complete! Access the Open WebUI at http://$EXTERNAL_IP.nip.io"
 }
