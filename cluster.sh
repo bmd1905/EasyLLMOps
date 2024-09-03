@@ -139,11 +139,11 @@ configure_api_key_secret() {
 
     ensure_namespace_exists "$model_serving_namespace"
 
-    log "Managing promptalchemy-env secret..."
-    kubectl get secret promptalchemy-env -n "$model_serving_namespace" >/dev/null 2>&1 && \
-        kubectl delete secret promptalchemy-env -n "$model_serving_namespace"
+    log "Managing easyllmops-env secret..."
+    kubectl get secret easyllmops-env -n "$model_serving_namespace" >/dev/null 2>&1 && \
+        kubectl delete secret easyllmops-env -n "$model_serving_namespace"
 
-    kubectl create secret generic promptalchemy-env --from-env-file="$env_file_path" -n "$model_serving_namespace" || \
+    kubectl create secret generic easyllmops-env --from-env-file="$env_file_path" -n "$model_serving_namespace" || \
         error_exit "Failed to create secret"
     success "API Key Secret configured successfully."
 }

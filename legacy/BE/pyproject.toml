@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "promptalchemy"
+name = "easyllmops"
 version = "0.1.0"
-description = "PromptAlchemy is an open-source library designed to elevate your prompt engineering game. By applying advanced techniques like Chain-of-Thought, Few-Shot Learning, and more, we transform basic user prompts into highly effective, complex prompts."
+description = "EasyLLMOps is an open-source library designed to elevate your prompt engineering game. By applying advanced techniques like Chain-of-Thought, Few-Shot Learning, and more, we transform basic user prompts into highly effective, complex prompts."
 authors = ["Minh-Duc Bui <minhduc2k31905@gmail.com>"]
 readme = "README.md"
 packages = [

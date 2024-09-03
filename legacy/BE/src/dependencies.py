@@ -24,7 +24,7 @@ def setup_prometheus() -> metrics.Meter:
         start_http_server(port=8099, addr='0.0.0.0')
 
         # Set up Prometheus metrics
-        resource = Resource(attributes={SERVICE_NAME: 'promptalchemy-service'})
+        resource = Resource(attributes={SERVICE_NAME: 'easyllmops-service'})
 
         # Set up Prometheus metric reader
         reader = PrometheusMetricReader()
@@ -34,7 +34,7 @@ def setup_prometheus() -> metrics.Meter:
         set_meter_provider(provider)
 
         # Get Prometheus meter
-        meter = metrics.get_meter('mypromptalchemy', '0.3.6')
+        meter = metrics.get_meter('myeasyllmops', '0.3.6')
 
         return meter
     except Exception as e:
@@ -47,11 +47,11 @@ def setup_jaeger() -> TracerProvider:
     try:
         # Set up Jaeger tracer provider
         set_tracer_provider(
-            TracerProvider(resource=Resource.create({SERVICE_NAME: 'promptalchemy-service-trace-manual'}))
+            TracerProvider(resource=Resource.create({SERVICE_NAME: 'easyllmops-service-trace-manual'}))
         )
 
         # Get Jaeger tracer
-        tracer = get_tracer_provider().get_tracer('mypromptalchemy-trace', '0.1.2')
+        tracer = get_tracer_provider().get_tracer('myeasyllmops-trace', '0.1.2')
 
         # Set up Jaeger exporter
         jaeger_exporter = JaegerExporter(
@@ -97,11 +97,11 @@ if tracer is None:
 else:
     logger.info('Tracer initialized successfully.')
 counter = meter.create_counter(
-    name='promptalchemy_request_counter',
-    description='Number of promptalchemy requests',
+    name='easyllmops_request_counter',
+    description='Number of easyllmops requests',
 )
 histogram = meter.create_histogram(
-    name='promptalchemy_response_histogram',
-    description='promptalchemy response histogram',
+    name='easyllmops_response_histogram',
+    description='easyllmops response histogram',
     unit='seconds',
 )

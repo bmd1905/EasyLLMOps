@@ -1,13 +1,13 @@
-# PromptAlchemy (WIP)
-[![Stars](https://img.shields.io/github/stars/bmd1905/PromptAlchemy.svg)](https://api.github.com/repos/bmd1905/PromptAlchemy)
+# EasyLLMOps
+[![Stars](https://img.shields.io/github/stars/bmd1905/EasyLLMOps.svg)](https://api.github.com/repos/bmd1905/EasyLLMOps)
 
-MLOps for LLMs, Simplified: PromptAlchemy Takes the Complexity Out.
+EasyLLMOps: Effortless MLOps for Powerful Language Models.
 
- [![Pipeline](./assets/prompt_alchemy.jpg)](#features)
+ [![Pipeline](./assets/easy-llmops.jpg)](#features)
 
 ## Introduction
 
-PromptAlchemy is a project built with Open WebUI that can be deployed on Google Kubernetes Engine (GKE) for managing and scaling language models. It offers both Terraform and manual deployment methods, and incorporates robust MLOps practices. This includes CI/CD pipelines with Jenkins and Ansible for automation, monitoring with Prometheus and Grafana for performance insights, and centralized logging with the ELK stack for troubleshooting and analysis. Developers can find detailed documentation and instructions on the project's website.
+EasyLLMOps is a project built with Open WebUI that can be deployed on Google Kubernetes Engine (GKE) for managing and scaling language models. It offers both Terraform and manual deployment methods, and incorporates robust MLOps practices. This includes CI/CD pipelines with Jenkins and Ansible for automation, monitoring with Prometheus and Grafana for performance insights, and centralized logging with the ELK stack for troubleshooting and analysis. Developers can find detailed documentation and instructions on the project's website.
 
 ## Features
 
@@ -23,6 +23,47 @@ Data scientists and machine learning engineers working with LLMs.
 DevOps teams responsible for managing LLM infrastructure.
 Organizations looking to integrate LLMs into their operations.
 
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Target Audience](#target-audience)
+- [Getting Started](#getting-started)
+  - [Quick Start](#quick-start)
+  - [Using Terraform for Google Kubernetes Engine (GKE)](#using-terraform-for-google-kubernetes-engine-gke)
+    - [Set up the Cluster](#set-up-the-cluster)
+    - [Retrieve Cluster Information](#retrieve-cluster-information)
+  - [Manual Deployment to GKE](#manual-deployment-to-gke)
+    - [Deploy Nginx Ingress Controller](#deploy-nginx-ingress-controller)
+    - [Configure API Key Secret](#configure-api-key-secret)
+    - [Grant Permissions](#grant-permissions)
+    - [Deploy caching service using Redis](#deploy-caching-service-using-redis)
+    - [Deploy LiteLLM](#deploy-litellm)
+    - [Deploy the Open WebUI](#deploy-the-open-webui)
+    - [Play around with the Application](#play-around-with-the-application)
+  - [Continuous Integration/Continuous Deployment (CI/CD) with Jenkins and Ansible](#continuous-integrationcontinuous-deployment-cicd-with-jenkins-and-ansible)
+    - [Set up Jenkins Server](#set-up-jenkins-server)
+    - [Access Jenkins](#access-jenkins)
+    - [Install Jenkins Plugins](#install-jenkins-plugins)
+    - [Configure Jenkins](#configure-jenkins)
+    - [Test the setup](#test-the-setup)
+  - [Monitoring with Prometheus and Grafana](#monitoring-with-prometheus-and-grafana)
+    - [Create Discord webhook](#create-discord-webhook)
+    - [Configure Helm Repositories](#configure-helm-repositories)
+    - [Install Dependencies](#install-dependencies)
+    - [Deploy Prometheus](#deploy-prometheus)
+    - [Test Alerting](#test-alerting)
+  - [Logging with Filebeat + Logstash + Elasticsearch + Kibana](#logging-with-filebeat-logstash-elasticsearch-kibana)
+    - [Quick run](#quick-run)
+    - [Install ELK Stack with Helm](#install-elk-stack-with-helm)
+    - [Access Kibana](#access-kibana)
+    - [Verify Log Collection](#verify-log-collection)
+- [Contributing](#contributing)
+- [License](#license)
+- [Citation](#citation)
+- [Contact](#contact)
+
 ## Getting Started
 
 In case you don't want to spend much time, please run this script and enjoy your coffee:
@@ -31,9 +72,12 @@ chmod +x ./cluster.sh
 ./cluster.sh
 ```
 
-### Using Terraform for Google Kubernetes Engine (GKE)
+### <a name="quick-start"></a>Quick Start
+This section provides a very quick start guide to get the application up and running as soon as possible. Please refer to the following sections for more detailed instructions. 
 
-**1. Set up the Cluster:**
+### <a name="using-terraform-for-google-kubernetes-engine-gke"></a>Using Terraform for Google Kubernetes Engine (GKE)
+
+**1. <a name="set-up-the-cluster"></a>Set up the Cluster:**
 
 If you're deploying the application to GKE, you can use Terraform to automate the setup of your Kubernetes cluster. Navigate to the `iac/terraform` directory and initialize Terraform:
 
@@ -52,7 +96,7 @@ terraform init
   terraform apply
   ```
 
-**2. Retrieve Cluster Information:**
+**2. <a name="retrieve-cluster-information"></a>Retrieve Cluster Information:**
 
 To interact with your GKE cluster, you'll need to retrieve its configuration. You can view the current cluster configuration with the following command:
 
@@ -64,11 +108,11 @@ cat ~/.kube/config
 
 Ensure your `kubectl` context is set correctly to manage the cluster.
 
-### Manual Deployment to GKE
+### <a name="manual-deployment-to-gke"></a>Manual Deployment to GKE
 
 For a more hands-on deployment process, follow these steps:
 
-**1. Deploy Nginx Ingress Controller:**
+**1. <a name="deploy-nginx-ingress-controller"></a>Deploy Nginx Ingress Controller:**
 
 The Nginx Ingress Controller manages external access to services in your Kubernetes cluster. Create a namespace and install the Ingress Controller using Helm:
 
@@ -82,21 +126,21 @@ Please story the Nginx Ingress Controller's IP address, as you'll need it later.
 
 ![Init Nginx Ingress Controller](assets/gifs/2-init-nginx-ingress-controller.gif)
 
-**2. Configure API Key Secret:**
+**2. <a name="configure-api-key-secret"></a>Configure API Key Secret:**
 
 Store your environment variables, such as API keys, securely in Kubernetes secrets. Create a namespace for model serving and create a secret from your `.env` file:
 
 ```bash
 kubectl create ns model-serving
 kubens model-serving
-kubectl delete secret promptalchemy-env 
-kubectl create secret generic promptalchemy-env --from-env-file=.env -n model-serving
-kubectl describe secret promptalchemy-env -n model-serving
+kubectl delete secret easyllmops-env 
+kubectl create secret generic easyllmops-env --from-env-file=.env -n model-serving
+kubectl describe secret easyllmops-env -n model-serving
 ```
 
 ![Deploy Secret](assets/gifs/3-deploy-secret.gif)
 
-**3. Grant Permissions:**
+**3. <a name="grant-permissions"></a>Grant Permissions:**
 
 Kubernetes resources often require specific permissions. Apply the necessary roles and bindings:
 
@@ -108,7 +152,7 @@ kubectl apply -f rolebinding.yaml
 
 ![Grant Permission](assets/gifs/4-grant-permission.gif)
 
-**4. Deploy caching service using Redis:**
+**4. <a name="deploy-caching-service-using-redis"></a>Deploy caching service using Redis:**
 
 Now, deploy the semantic caching service using Redis:
 ```bash
@@ -119,7 +163,7 @@ helm upgrade --install redis .
 
 ![Deploy Redis](assets/gifs/5-deploy-redis.gif)
 
-**5. Deploy LiteLLM:**
+**5. <a name="deploy-litellm"></a>Deploy LiteLLM:**
 
 Deploy the [LiteLLM](https://github.com/BerriAI/litellm) service:
 
@@ -130,7 +174,7 @@ helm upgrade --install litellm ./deployments/litellm
 
 ![Deploy Litellm](assets/gifs/6-deploy-litellm.gif)
 
-**6. Deploy the Open WebUI:**
+**6. <a name="deploy-the-open-webui"></a>Deploy the Open WebUI:**
 
 Next, Deploy the web UI to your GKE cluster:
 
@@ -141,17 +185,17 @@ kubectl apply -f ./kubernetes/manifest/base -n model-serving
 
 ![Deploy Open WebUI](assets/gifs/7-deploy-openwebui.gif)
 
-**7. Play around with the Application:**
+**7. <a name="play-around-with-the-application"></a>Play around with the Application:**
 
 Open browser and navigate to the URL of your GKE cluster (e.g. `http://172.0.0.0` in step 1) and add `.nip.io` to the end of the URL (e.g. `http://172.0.0.0.nip.io`). You should see the Open WebUI:
 
 ![Final Web App](assets/gifs/8-final-web-app.gif)
 
-### Continuous Integration/Continuous Deployment (CI/CD) with Jenkins and Ansible
+### <a name="continuous-integrationcontinuous-deployment-cicd-with-jenkins-and-ansible"></a>Continuous Integration/Continuous Deployment (CI/CD) with Jenkins and Ansible
 
 For automated CI/CD pipelines, use Jenkins and Ansible as follows:
 
-**1. Set up Jenkins Server:**
+**1. <a name="set-up-jenkins-server"></a>Set up Jenkins Server:**
 
 First, create a Service Account and assign it the `Compute Admin` role. Then create a Json key file for the Service Account and store it in the `iac/ansible/secrets` directory.
 
@@ -169,7 +213,7 @@ ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenk
 
 ![Create Ansible secrets](assets/gifs/9-create-ansible-secrets.gif)
 
-**2. Access Jenkins:**
+**2. <a name="access-jenkins"></a>Access Jenkins:**
 
 To access the Jenkins server through SSH, we need to create a public/private key pair. Run the following command to create a key pair:
 
@@ -204,7 +248,7 @@ http://<EXTERNAL_IP>:8081
 
 ![Access Jenkins](assets/gifs/12-access-jenkins-server.gif)
 
-**3. Install Jenkins Plugins:**
+**3. <a name="install-jenkins-plugins"></a>Install Jenkins Plugins:**
 
 Install the following plugins to integrate Jenkins with Docker, Kubernetes, and GKE:
 
@@ -221,7 +265,7 @@ sudo docker restart jenkins-server
 
 ![Install Jenkins Plugins](assets/gifs/13-install-plugins.gif)
 
-**4. Configure Jenkins:**
+**4. <a name="configure-jenkins"></a>Configure Jenkins:**
 
 4.1. Add webhooks to your GitHub repository to trigger Jenkins builds.
 
@@ -231,13 +275,13 @@ Go to the GitHub repository and click on `Settings`. Click on `Webhooks` and the
 
 4.2. Add Github repository as a Jenkins source code repository.
 
-Go to Jenkins dashboard and click on `New Item`. Enter a name for your project (e.g. `prompt-alchemy`) and select `Multibranch Pipeline`. Click on `OK`. Click on `Configure` and then click on `Add Source`. Select `GitHub` and click on `Add`. Enter the URL of your GitHub repository (e.g. `https://github.com/bmd1905/PromptAlchemy`). In the `Credentials` field, select `Add` and select `Username with password`. Enter your GitHub username and password (or use a personal access token). Click on `Test Connection` and then click on `Save`.
+Go to Jenkins dashboard and click on `New Item`. Enter a name for your project (e.g. `easy-llmops`) and select `Multibranch Pipeline`. Click on `OK`. Click on `Configure` and then click on `Add Source`. Select `GitHub` and click on `Add`. Enter the URL of your GitHub repository (e.g. `https://github.com/bmd1905/EasyLLMOps`). In the `Credentials` field, select `Add` and select `Username with password`. Enter your GitHub username and password (or use a personal access token). Click on `Test Connection` and then click on `Save`.
 
 ![Add Github repository as a Jenkins source code repository](assets/gifs/15-add-github-repo.gif)
 
 4.3. Setup docker hub credentials.
 
-First, create a Docker Hub account. Go to the Docker Hub website and click on `Sign Up`. Enter your username and password. Click on `Sign Up`. Click on `Create Repository`. Enter a name for your repository (e.g. `prompt-alchemy`) and click on `Create`.
+First, create a Docker Hub account. Go to the Docker Hub website and click on `Sign Up`. Enter your username and password. Click on `Sign Up`. Click on `Create Repository`. Enter a name for your repository (e.g. `easy-llmops`) and click on `Create`.
 
 From Jenkins dashboard, go to `Manage Jenkins` > `Credentials`. Click on `Add Credentials`. Select `Username with password` and click on `Add`. Enter your Docker Hub username, access token, and set `ID` to `dockerhub`.
 
@@ -249,27 +293,27 @@ First, create a Service Account for the Jenkins server to access the GKE cluster
 
 ![Setup Kubernetes credentials](assets/gifs/17-setup-kubernetes-credentials.gif)
 
-Then, from Jenkins dashboard, go to `Manage Jenkins` > `Cloud`. Click on `New cloud`. Select `Kubernetes`. Enter the name of your cluster (e.g. `gke-prompt-alchemy-cluster-1), enter the URL and Certificate from your GKE cluster. In the `Kubernetes Namespace`, enter the namespace of your cluster (e.g. `model-serving`). In the `Credentials` field, select `Add` and select `Google Service Account from private`. Enter your project-id and the path to the JSON file.
+Then, from Jenkins dashboard, go to `Manage Jenkins` > `Cloud`. Click on `New cloud`. Select `Kubernetes`. Enter the name of your cluster (e.g. `gke-easy-llmops-cluster-1), enter the URL and Certificate from your GKE cluster. In the `Kubernetes Namespace`, enter the namespace of your cluster (e.g. `model-serving`). In the `Credentials` field, select `Add` and select `Google Service Account from private`. Enter your project-id and the path to the JSON file.
 
 ![Setup Kubernetes credentials](assets/gifs/18-setup-kubernetes-credentials.gif)
 
-**5. Test the setup:**
+**5. <a name="test-the-setup"></a>Test the setup:**
 
 Push a new commit to your GitHub repository. You should see a new build in Jenkins.
 
 ![Test the setup](assets/gifs/19-test-cicd.gif)
 
 
-### Monitoring with Prometheus and Grafana
+### <a name="monitoring-with-prometheus-and-grafana"></a>Monitoring with Prometheus and Grafana
 
-**1. Create Discord webhook:**
+**1. <a name="create-discord-webhook"></a>Create Discord webhook:**
 
-First, create a Discord webhook. Go to the Discord website and click on `Server Settings`. Click on `Integrations`. Click on `Create Webhook`. Enter a name for your webhook (e.g. `prompt-alchemy-discord-webhook`) and click on `Create`. Copy the webhook URL.
+First, create a Discord webhook. Go to the Discord website and click on `Server Settings`. Click on `Integrations`. Click on `Create Webhook`. Enter a name for your webhook (e.g. `easy-llmops-discord-webhook`) and click on `Create`. Copy the webhook URL.
 
 ![Create Discord webhook](assets/gifs/20-create-discord-webhook.gif)
 
 
-**2. Configure Helm Repositories**
+**2. <a name="configure-helm-repositories"></a>Configure Helm Repositories**
 
 First, we need to add the necessary Helm repositories for Prometheus and Grafana:
 
@@ -281,7 +325,7 @@ helm repo update
 
 These commands add the official Prometheus and Grafana Helm repositories and update your local Helm chart information.
 
-**3. Install Dependencies**
+**3. <a name="install-dependencies"></a>Install Dependencies**
 
 Prometheus requires certain dependencies that can be managed with Helm. Navigate to the monitoring directory and build these dependencies:
 
@@ -289,7 +333,7 @@ Prometheus requires certain dependencies that can be managed with Helm. Navigate
 helm dependency build ./deployments/monitoring/kube-prometheus-stack
 ```
 
-**4. Deploy Prometheus**
+**4. <a name="deploy-prometheus"></a>Deploy Prometheus**
 
 Now, we'll deploy Prometheus and its associated services using Helm:
 
@@ -327,7 +371,7 @@ The default credentials for Grafana are usually:
 
 ![Access Prometheus and Grafana](assets/gifs/22-access-prom-graf.gif)
 
-**5. Test Alerting**
+**5. <a name="test-alerting"></a>Test Alerting**
 
 First we need to create a sample alert. Navigate to the `monitoring` directory and run the following command:
 
@@ -385,11 +429,11 @@ Or, you can manually check the Discord channel.
 
 This setup provides comprehensive monitoring capabilities for your Kubernetes cluster. With Prometheus collecting metrics and Grafana visualizing them, you can effectively track performance, set up alerts for potential issues, and gain valuable insights into your infrastructure and applications.
 
-### Logging with Filebeat + Logstash + Elasticsearch + Kibana
+### <a name="logging-with-filebeat-logstash-elasticsearch-kibana"></a>Logging with Filebeat + Logstash + Elasticsearch + Kibana
 
 Centralized logging is essential for monitoring and troubleshooting applications deployed on Kubernetes. This section guides you through setting up an ELK stack (Elasticsearch, Logstash, Kibana) with Filebeat for logging your GKE cluster.
 
-**0. Quick run**
+**0. <a name="quick-run"></a>Quick run**
 
 You can use this single bash script to kick off the ELK stack:
 
@@ -399,7 +443,7 @@ chmod +x ./run.sh
 ./run.sh
 ```
 
-**1. Install ELK Stack with Helm**
+**1. <a name="install-elk-stack-with-helm"></a>Install ELK Stack with Helm**
 
 We will use Helm to deploy the ELK stack components:
 
@@ -456,7 +500,7 @@ helm install elk-filebeat elastic/filebeat -f deployments/ELK/filebeat.expanded.
 
 ![Deploy ELK](assets/gifs/24-deploy-elk.gif)
 
-**2. Access Kibana:**
+**2. <a name="access-kibana"></a>Access Kibana:**
 
 Expose Kibana using a service and access it through your browser:
 
@@ -471,26 +515,26 @@ kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonp
 
 Open your browser and navigate to `http://localhost:5601`.
 
-**3. Verify Log Collection**
+**3. <a name="verify-log-collection"></a>Verify Log Collection**
 
 You should now be able to see logs from your Kubernetes pods in Kibana. You can create dashboards and visualizations to analyze your logs and gain insights into your application's behavior.
 
 ![Access Kibana](assets/gifs/25-access-kibana.gif)
 
 ## Contributing
-We welcome contributions to PromptAlchemy! Please see our CONTRIBUTING.md for more information on how to get started.
+We welcome contributions to EasyLLMOps! Please see our CONTRIBUTING.md for more information on how to get started.
 
 ## License
-PromptAlchemy is released under the MIT License. See the LICENSE file for more details.
+EasyLLMOps is released under the MIT License. See the LICENSE file for more details.
 
 ## Citation
-If you use PromptAlchemy in your research, please cite it as follows:
+If you use EasyLLMOps in your research, please cite it as follows:
 ```
-@software{PromptAlchemy2024,
+@software{EasyLLMOps2024,
   author = {Minh-Duc Bui},
-  title = {PromptAlchemy: Transform basic queries into sophisticated prompts},
+  title = {EasyLLMOps: Effortless MLOps for Powerful Language Models.},
   year = {2024},
-  url = {https://github.com/bmd1905/PromptAlchemy}
+  url = {https://github.com/bmd1905/EasyLLMOps}
 }
 ```
 

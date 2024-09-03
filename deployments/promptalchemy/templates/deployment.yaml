@@ -23,4 +23,4 @@ spec:
             - containerPort: 30000
           envFrom:
             - secretRef:
-                name: promptalchemy-env
+                name: easyllmops-env

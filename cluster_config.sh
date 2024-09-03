@@ -5,7 +5,7 @@
 
 # GCP Configuration
 GCP_CONFIG_KEYS=("PROJECT" "ZONE" "CLUSTER_NAME")
-GCP_CONFIG_VALUES=("prompt-alchemy" "asia-southeast1-b" "prompt-alchemy-gke")
+GCP_CONFIG_VALUES=("easy-llmops" "asia-southeast1-b" "easy-llmops-gke")
 
 # Namespace Configuration
 NAMESPACE_KEYS=("MODEL_SERVING" "NGINX")

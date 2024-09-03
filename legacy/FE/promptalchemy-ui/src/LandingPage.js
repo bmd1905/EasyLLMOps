@@ -28,7 +28,7 @@ const TypingEffect = ({ text }) => <Text>{text}</Text>;
 const Testimonials = () => <Box></Box>;
 const InteractiveDemo = () => <Box></Box>;
 
-const PromptAlchemyLanding = () => {
+const EasyLLMOpsLanding = () => {
   const bgGradient = useColorModeValue('linear(to-br, purple.100, indigo.100)', 'linear(to-br, purple.200, indigo.200)');
   const cardBg = useColorModeValue('whiteAlpha.800', 'whiteAlpha.900');
   const textColor = useColorModeValue('gray.800', 'gray.100');
@@ -57,15 +57,15 @@ const PromptAlchemyLanding = () => {
   return (
     <Box minH="100vh" color={textColor} overflow="hidden">
       <Helmet>
-        <title>PromptAlchemy - Transform Your Prompts</title>
-        <meta name="description" content="PromptAlchemy helps you transform basic queries into sophisticated prompts for exceptional results with AI language models." />
+        <title>EasyLLMOps - Transform Your Prompts</title>
+        <meta name="description" content="EasyLLMOps helps you transform basic queries into sophisticated prompts for exceptional results with AI language models." />
         <script type="application/ld+json">
           {`
             {
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "PromptAlchemy",
-              "url": "https://promptalchemy.com",
+              "name": "EasyLLMOps",
+              "url": "https://easyllmops.com",
               "description": "Transform basic queries into sophisticated prompts for exceptional results with AI language models."
             }
           `}
@@ -89,7 +89,7 @@ const PromptAlchemyLanding = () => {
         >
           <Image
             src="/static/logo/logo-transparent.png"
-            alt="PromptAlchemy Logo"
+            alt="EasyLLMOps Logo"
             pt="inherit"
             width="250px"
             height="250px"
@@ -181,7 +181,7 @@ const PromptAlchemyLanding = () => {
           </MotionHeading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
             {[
-              { title: "Intuitive API", description: "Easily integrate PromptAlchemy into your projects." },
+              { title: "Intuitive API", description: "Easily integrate EasyLLMOps into your projects." },
               { title: "Versatile Techniques", description: "Apply a range of prompt engineering strategies." },
               { title: "Customizable", description: "Tailor the transformation process to your specific needs." },
               { title: "Open-source", description: "Contribute to the development and benefit from the community." },
@@ -212,12 +212,12 @@ const PromptAlchemyLanding = () => {
             <h2>
               <AccordionButton>
                 <Box flex="1" textAlign="left">
-                  What is PromptAlchemy?
+                  What is EasyLLMOps?
                 </Box>
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              PromptAlchemy is a tool that helps you transform basic queries into sophisticated prompts for better results when working with AI language models.
+              EasyLLMOps is a tool that helps you transform basic queries into sophisticated prompts for better results when working with AI language models.
             </AccordionPanel>
           </AccordionItem>
           {/* Add more FAQ items here */}
@@ -225,10 +225,10 @@ const PromptAlchemyLanding = () => {
       </Container>
 
       <Box py={6} textAlign="center" position="relative">
-        <Text>&copy; 2024 PromptAlchemy. All rights reserved.</Text>
+        <Text>&copy; 2024 EasyLLMOps. All rights reserved.</Text>
       </Box>
     </Box>
   );
 };
 
-export default React.memo(PromptAlchemyLanding);
+export default React.memo(EasyLLMOpsLanding);

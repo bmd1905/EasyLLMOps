@@ -36,17 +36,17 @@ Next, create a Kubernetes namespace and secret to store your environment variabl
 # Create a namespace for the Prompt Alchemy application
 kubectl create ns model-serving
 
-# Switch to the promptalchemy namespace
+# Switch to the easyllmops namespace
 kubens model-serving
 
 # Navigate to the Prompt Alchemy deployment directory
-cd deployments/promptalchemy
+cd deployments/easyllmops
 
 # Create a Kubernetes secret from the .env file to securely store environment variables
-kubectl create secret generic promptalchemy-env --from-env-file=.env -n model-serving
+kubectl create secret generic easyllmops-env --from-env-file=.env -n model-serving
 
 # Verify that the secret has been created successfully
-kubectl describe secret promptalchemy-env -n model-serving
+kubectl describe secret easyllmops-env -n model-serving
 ```
 
 This ensures that the Prompt Alchemy application can access the necessary environment variables securely.
@@ -57,7 +57,7 @@ Deploy or upgrade your application using Helm:
 
 ```bash
 # Deploy or upgrade the Prompt Alchemy application using Helm with debugging and force options
-helm upgrade --install promptalchemy ./deployments/promptalchemy --debug --force
+helm upgrade --install easyllmops ./deployments/easyllmops --debug --force
 ```
 
 This command will either install the application if it doesn't exist or upgrade it to the latest version if it's already deployed.
@@ -68,7 +68,7 @@ To access your application locally, use port forwarding:
 
 ```bash
 # Forward the local port 30000 to the service's port 30000 in the Kubernetes cluster
-kubectl port-forward svc/promptalchemy 30000:30000
+kubectl port-forward svc/easyllmops 30000:30000
 ```
 
 Now you can access your Prompt Alchemy application at `http://localhost:30000`.
@@ -87,7 +87,7 @@ You can customize the deployment by modifying the `values.yaml` file or by passi
 
 ```bash
 # Deploy or upgrade the Prompt Alchemy application with a custom number of replicas
-helm upgrade --install promptalchemy . --set replicaCount=3
+helm upgrade --install easyllmops . --set replicaCount=3
 ```
 
 ## Troubleshooting
@@ -95,7 +95,7 @@ helm upgrade --install promptalchemy . --set replicaCount=3
 If you encounter issues:
 
 ```bash
-# Check the status of all pods in the promptalchemy namespace
+# Check the status of all pods in the easyllmops namespace
 kubectl get pods -n model-serving
 
 # View the logs of a specific pod (replace <pod-name> with the actual pod name)
@@ -111,7 +111,7 @@ To remove the application:
 
 ```bash
 # Uninstall the Prompt Alchemy application
-helm uninstall promptalchemy
+helm uninstall easyllmops
 ```
 
 Remember to delete any persistent volumes or other resources that were not managed by Helm if necessary.

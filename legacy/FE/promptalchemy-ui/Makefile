@@ -1,6 +1,6 @@
 # Variables
-IMAGE_NAME := promptalchemy-ui
-CONTAINER_NAME := promptalchemy-ui-container
+IMAGE_NAME := easyllmops-ui
+CONTAINER_NAME := easyllmops-ui-container
 PORT := 3000
 DOCKER_FILE := Dockerfile
 
