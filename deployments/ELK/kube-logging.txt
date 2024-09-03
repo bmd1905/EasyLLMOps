@@ -1,0 +1,165 @@
+Folder Structure
+--------------------------------------------------
+./
+    filebeat.expanded.yaml
+    run.sh
+    elastic.expanded.yaml
+    logstash.expanded.yaml
+    kibana.expanded.yaml
+
+
+File Contents
+--------------------------------------------------
+
+
+./filebeat.expanded.yaml
+File type: .yaml
+daemonset:
+  filebeatConfig:
+    filebeat.yml: |
+      filebeat.inputs:
+      - type: container
+        paths:
+          - /var/log/containers/*.log
+        processors:
+        - add_kubernetes_metadata:
+            host: ${NODE_NAME}
+            matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+
+      output.logstash:
+        hosts: ["elk-logstash-logstash-headless.logging.svc.cluster.local:5044"]
+        timeout: 15
+
+      logging.level: info
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+./run.sh
+File type: .sh
+#!/bin/bash
+
+# Create namespace and switch context
+kubectl create ns logging
+kubens logging
+
+# Install Elasticsearch
+helm install elk-elasticsearch elastic/elasticsearch -f elastic.expanded.yaml --namespace logging --create-namespace
+
+# Wait for Elasticsearch to be ready
+echo "Waiting for Elasticsearch to be ready..."
+kubectl wait --for=condition=ready pod -l app=elasticsearch-master --timeout=300s
+
+# Create a secret for Logstash to access Elasticsearch
+kubectl create secret generic logstash-elasticsearch-credentials \
+  --from-literal=username=elastic \
+  --from-literal=password=$(kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d)
+
+# Install Kibana
+helm install elk-kibana elastic/kibana -f kibana.expanded.yaml
+
+# Install Logstash
+helm install elk-logstash elastic/logstash -f logstash.expanded.yaml
+
+# Install Filebeat
+helm install elk-filebeat elastic/filebeat -f filebeat.expanded.yaml
+
+echo "ELK stack installation complete."
+echo "Elasticsearch credentials are stored in the 'logstash-elasticsearch-credentials' secret"
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+./elastic.expanded.yaml
+File type: .yaml
+replicas: 1
+minimumMasterNodes: 1
+resouces:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 100Gi
+http:
+  enabled: true
+  tls:
+    enabled: true
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+./logstash.expanded.yaml
+File type: .yaml
+logstashConfig:
+  logstash.yml: |
+    http.host: 0.0.0.0
+    xpack.monitoring.enabled: false
+
+logstashPipeline: 
+ logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => ["https://elasticsearch-master-headless.logging.svc.cluster.local:9200"]
+        manage_template => false
+        index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        document_type => "%{[@metadata][type]}"
+        ssl => true
+        ssl_certificate_verification => false
+        user => '${ELASTICSEARCH_USERNAME}'
+        password => '${ELASTICSEARCH_PASSWORD}'
+      }
+    }
+extraEnvs:
+  - name: ELASTICSEARCH_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: logstash-elasticsearch-credentials
+        key: username
+  - name: ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: logstash-elasticsearch-credentials
+        key: password
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+./kibana.expanded.yaml
+File type: .yaml
+elasticsearchHosts: "https://elasticsearch-master:9200"
+replicas: 1
+resources:
+  requests:
+    cpu: "200m"
+    memory: "200Mi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+kibanaConfig:
+  kibana.yml: |
+    elasticsearch.ssl.verificationMode: none
+
+--------------------------------------------------
+File End
+--------------------------------------------------

@@ -9,10 +9,10 @@ metadata:
 spec:
   # tls:
   # - hosts:
-  #   - 34.142.157.145.nip.io
+  #   - 0.0.0.0.nip.io
   #   secretName: webui-tls
   rules:
-  - host: 34.142.157.145.nip.io
+  - host: 0.0.0.0.nip.io
     http:
       paths:
       - path: /

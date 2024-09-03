@@ -476,6 +476,38 @@ Or, you can manually check the Discord channel.
 
 This setup provides comprehensive monitoring capabilities for your Kubernetes cluster. With Prometheus collecting metrics and Grafana visualizing them, you can effectively track performance, set up alerts for potential issues, and gain valuable insights into your infrastructure and applications.
 
+### Logging with Fluent Bit + ElaSticsearch + Kibana
+
+First, create a namepsace for logging:
+
+```bash
+kubectl create ns logging
+```
+
+**1. Install Fluent Bit**
+
+```bash
+helm upgrade --install -f ./deployments/monitoring/fluent-bit.expanded.yaml fluent-bit ./deployments/monitoring/fluent-bit -n logging
+```
+
+
+**2. Install Elasticsearch**
+
+```bash
+helm upgrade --install -f ./deployments/monitoring/elasticsearch.expanded.yaml elasticsearch ./deployments/monitoring/elasticsearch -n logging
+```
+
+**3. Install Kibana**
+
+```bash
+helm upgrade --install -f ./deployments/monitoring/kibana.expanded.yaml kibana ./deployments/monitoring/kibana -n logging
+```
+
+```bash
+kubectl apply -f ./deployments/monitoring/kibana-simple
+```
+
+
 ## Contributing
 We welcome contributions to PromptAlchemy! Please see our CONTRIBUTING.md for more information on how to get started.
 

@@ -1,0 +1,12 @@
+elasticsearchHosts: "https://elasticsearch-master:9200"
+replicas: 1
+resources:
+  requests:
+    cpu: "200m"
+    memory: "200Mi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+kibanaConfig:
+  kibana.yml: |
+    elasticsearch.ssl.verificationMode: none

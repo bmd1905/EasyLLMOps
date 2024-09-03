@@ -27,11 +27,11 @@ resource "google_container_cluster" "primary" {
   enable_autopilot = false
 
   // Specify the initial number of nodes
-  initial_node_count = 2
+  initial_node_count = 3
 
   // Node configuration
   node_config {
-    machine_type = "e2-highcpu-4" // 4 vCPUs, 4 GB RAM
+    machine_type = "e2-standard-2" // 2 vCPUs, 8 GB RAM
     disk_size_gb = 30
   }
 }
