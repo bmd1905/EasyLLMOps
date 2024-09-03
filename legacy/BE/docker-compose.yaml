@@ -1,12 +1,12 @@
 version: '3.9'
 
 services:
-  promptalchemy:
+  easyllmops:
     build:
       context: .
       dockerfile: Dockerfile
-    image: promptalchemy
-    container_name: promptalchemy
+    image: easyllmops
+    container_name: easyllmops
     env_file:
       - .env
     ports:

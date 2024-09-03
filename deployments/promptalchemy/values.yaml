@@ -1,4 +1,4 @@
 image:
-  repository: bmd1905/promptalchemy
+  repository: bmd1905/easyllmops
   tag: "latest"
   pullPolicy: Always

@@ -7,11 +7,11 @@ from fastapi.testclient import TestClient
 
 from src.configs.prompt_config.prompt_loader import prompt_loader
 from src.llms.base import client
-from src.routers.promptalchemy import promptalchemy_router
+from src.routers.easyllmops import easyllmops_router
 from src.schemas.prompt_schema import PromptRequest, PromptType
 
 # Create a TestClient for integration tests
-test_client = TestClient(promptalchemy_router)
+test_client = TestClient(easyllmops_router)
 
 # Sample test data
 mock_prompt_request = PromptRequest(prompt='Write a small blog post about AI', prompt_type='enhance_prompt')

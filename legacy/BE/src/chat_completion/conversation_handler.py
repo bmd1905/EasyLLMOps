@@ -8,7 +8,7 @@ from src.schemas.prompt_schema import ConversationIn
 
 
 class ConversationHandler:
-    """The conversation handler for the PromptAlchemy API."""
+    """The conversation handler for the EasyLLMOps API."""
 
     def __init__(self, prompt_enhancer: PromptEnhancer, model: str):
         """
@@ -22,7 +22,7 @@ class ConversationHandler:
 
     async def handle_conversation(self, data: ConversationIn):
         """
-        Handles the conversation endpoint for the PromptAlchemy API.
+        Handles the conversation endpoint for the EasyLLMOps API.
 
         :param data: The conversation data
 

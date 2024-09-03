@@ -8,10 +8,10 @@
         # Refer to https://cloud.google.com/compute/docs/images/os-details#ubuntu_lts
         # or use the command `gcloud compute images list --project=ubuntu-os-cloud`
         zone: us-central1-a
-        project: prompt-alchemy
+        project: easy-llmops
         # The service account is needed to create the resources
         auth_kind: serviceaccount
-        service_account_file: ../secrets/prompt-alchemy-d32063c4c41d.json
+        service_account_file: ../secrets/easy-llmops-d32063c4c41d.json
         disks:
           - auto_delete: true
             boot: true
@@ -40,6 +40,6 @@
           - 0.0.0.0/0 # Allow traffic from any source (use a more specific source range for security)
         direction: INGRESS # Direction from outside to inside, EGRESS is the opposite direction
         description: Allow incoming traffic on port 30000
-        project: prompt-alchemy
+        project: easy-llmops
         auth_kind: serviceaccount
-        service_account_file: ../secrets/prompt-alchemy-d32063c4c41d.json
+        service_account_file: ../secrets/easy-llmops-d32063c4c41d.json

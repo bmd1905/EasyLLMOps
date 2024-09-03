@@ -25,7 +25,7 @@ spec:
             name: {{ .Release.Name }}
             port:
               number: 30000
-      - path: /api/promptalchemy_conversation/conversation
+      - path: /api/easyllmops_conversation/conversation
         pathType: Prefix
         backend:
           service:

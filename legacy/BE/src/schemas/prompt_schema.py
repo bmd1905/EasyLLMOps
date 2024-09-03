@@ -37,25 +37,25 @@ class CompletionIn(BaseModel):
 
 
 # ------------------------------- Response Models -------------------------------
-class PromptAlchemyResponse(BaseModel):
-    """Pydantic model for prompt alchemy response."""
+class EasyLLMOpsResponse(BaseModel):
+    """Pydantic model for easy llmops response."""
 
     optimized_prompt: str
     content: str
 
 
-class PromptAlchemyOut(BaseModel):
-    """Pydantic model for prompt alchemy output."""
+class EasyLLMOpsOut(BaseModel):
+    """Pydantic model for easy llmops output."""
 
     body: str
     final_prompt: str
 
 
 response_format_map = {
-    PromptType.ENHANCE_PROMPT: PromptAlchemyOut,
-    PromptType.FEW_SHOT_PROMPT: PromptAlchemyOut,
-    PromptType.CHAIN_OF_THOUGHT_PROMPT: PromptAlchemyOut,
-    PromptType.STRUCTURE_OUTPUT_PROMPT: PromptAlchemyOut,
+    PromptType.ENHANCE_PROMPT: EasyLLMOpsOut,
+    PromptType.FEW_SHOT_PROMPT: EasyLLMOpsOut,
+    PromptType.CHAIN_OF_THOUGHT_PROMPT: EasyLLMOpsOut,
+    PromptType.STRUCTURE_OUTPUT_PROMPT: EasyLLMOpsOut,
 }
 
 

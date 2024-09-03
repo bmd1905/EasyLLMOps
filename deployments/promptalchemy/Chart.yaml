@@ -1,6 +1,6 @@
 apiVersion: v2
-name: promptalchemy
-description: My Helm Chart for PromptAlchemy
+name: easyllmops
+description: My Helm Chart for EasyLLMOps
 
 # A chart can be `application` or `library`,
 # we don't use `library` so often

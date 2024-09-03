@@ -25,12 +25,12 @@ services:
       - default
       - monitoring
 
-  promptalchemy:
+  easyllmops:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    image: promptalchemy
-    container_name: promptalchemy
+    image: easyllmops
+    container_name: easyllmops
     command: ["sh", "-c", "make start-standalone-server"]
     volumes:
       - ./src:/app/src

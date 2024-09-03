@@ -18,8 +18,8 @@ const useChat = () => {
     setIsTyping(true);
 
     try {
-      // const response = await fetch('http://localhost:30000/api/promptalchemy_conversation/conversation', {
-      const response = await fetch('http://35.240.206.150.nip.io/api/promptalchemy_conversation/conversation', {
+      // const response = await fetch('http://localhost:30000/api/easyllmops_conversation/conversation', {
+      const response = await fetch('http://35.240.206.150.nip.io/api/easyllmops_conversation/conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

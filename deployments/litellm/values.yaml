@@ -50,7 +50,7 @@ securityContext: {}
 #  pod as environment variables.  These secrets can then be referenced in the
 #  configuration file (or "litellm" ConfigMap) with `os.environ/<Env Var Name>`
 environmentSecrets:
-  - promptalchemy-env
+  - easyllmops-env
 
 service:
   type: ClusterIP

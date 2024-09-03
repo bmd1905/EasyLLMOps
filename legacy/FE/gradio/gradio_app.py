@@ -4,7 +4,7 @@ from typing import AsyncGenerator
 import gradio as gr
 import requests
 
-API_URL = "http://localhost:8000/api/promptalchemy_conversation/conversation"
+API_URL = "http://localhost:8000/api/easyllmops_conversation/conversation"
 
 
 def _prepare_api_data(
