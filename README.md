@@ -3,7 +3,7 @@
 
 EasyLLMOps: Effortless MLOps for Powerful Language Models.
 
- [![Pipeline](./assets/easy-llmops.jpg)](#features)
+ [![Pipeline](./assets/easy-llmops.png)](#features)
 
 ## Introduction
 
