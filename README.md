@@ -9,14 +9,14 @@ EasyLLMOps: Effortless MLOps for Powerful Language Models.
 
 EasyLLMOps is a project built with Open WebUI that can be deployed on Google Kubernetes Engine (GKE) for managing and scaling language models. It offers both Terraform and manual deployment methods, and incorporates robust MLOps practices. This includes CI/CD pipelines with Jenkins and Ansible for automation, monitoring with Prometheus and Grafana for performance insights, and centralized logging with the ELK stack for troubleshooting and analysis. Developers can find detailed documentation and instructions on the project's website.
 
+https://github.com/user-attachments/assets/cf84a434-0dae-47b9-a93d-49a37965d968
+
 ## Features
 
 - **Ease of Use**: EasyLLMOps provides an intuitive interface and streamlined workflows that make managing LLMs simple and efficient, regardless of your experience level.
 - **Scalability & Flexibility**: Scale your LLM deployments effortlessly, adapt to evolving needs, and integrate seamlessly with your existing infrastructure.
 - **Reduced Complexity**: Eliminate the hassle of complex configurations and infrastructure management, allowing you to focus on building and deploying powerful LLM applications.
 - **Enhanced Productivity**: Accelerate your LLM development lifecycle, optimize performance, and maximize the impact of your language models.
-
-https://github.com/user-attachments/assets/cf84a434-0dae-47b9-a93d-49a37965d968
 
 ## Target Audience
 
