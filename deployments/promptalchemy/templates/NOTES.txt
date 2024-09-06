@@ -1,1 +1,0 @@
-The EasyLLMOps server can be accessed via port 30000 on the following DNS name from within your cluster

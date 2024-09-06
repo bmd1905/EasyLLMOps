@@ -1,4 +1,0 @@
-image:
-  repository: bmd1905/easyllmops
-  tag: "latest"
-  pullPolicy: Always
