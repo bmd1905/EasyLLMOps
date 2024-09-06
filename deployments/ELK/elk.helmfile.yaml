@@ -1,0 +1,68 @@
+---
+repositories:
+  - name: elastic
+    url: https://helm.elastic.co
+
+releases:
+  - name: elk-elasticsearch
+    namespace: logging
+    chart: elastic/elasticsearch
+    version: 7.17.3
+    values:
+      - ./elastic.expanded.yaml
+
+  - name: elk-kibana
+    namespace: logging
+    chart: elastic/kibana
+    version: 7.17.3
+    values:
+      - ./kibana.expanded.yaml
+    needs:
+      - logging/elk-elasticsearch
+
+  - name: elk-logstash
+    namespace: logging
+    chart: elastic/logstash
+    version: 7.17.3
+    values:
+      - ./logstash.expanded.yaml
+    needs:
+      - logging/elk-elasticsearch
+
+  - name: elk-filebeat
+    namespace: logging
+    chart: elastic/filebeat
+    version: 7.17.3
+    values:
+      - ./filebeat.expanded.yaml
+    needs:
+      - logging/elk-logstash
+
+# Hooks to create namespace and secrets
+hooks:
+  - events: ["presync"]
+    showlogs: true
+    command: "kubectl"
+    args:
+      - create
+      - namespace
+      - logging
+      - --dry-run=client
+      - -o=yaml
+      - "|"
+      - kubectl
+      - apply
+      - -f
+      - -
+
+  - events: ["presync"]
+    showlogs: true
+    command: "sh"
+    args:
+      - -c
+      - |
+        kubectl create secret generic logstash-elasticsearch-credentials \
+          --from-literal=username=elastic \
+          --from-literal=password=$(kubectl get secrets --namespace=logging elasticsearch-master-credentials -ojsonpath='{.data.password}' | base64 -d) \
+          --namespace=logging \
+          --dry-run=client -o yaml | kubectl apply -f -

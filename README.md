@@ -435,12 +435,11 @@ Centralized logging is essential for monitoring and troubleshooting applications
 
 **0. <a name="quick-run"></a>Quick run**
 
-You can use this single bash script to kick off the ELK stack:
+You can use this single helmfile script to kick off the ELK stack:
 
 ```bash
-cd ELK
-chmod +x ./run.sh
-./run.sh
+cd deployments/ELK
+helmfile sync
 ```
 
 **1. <a name="install-elk-stack-with-helm"></a>Install ELK Stack with Helm**
