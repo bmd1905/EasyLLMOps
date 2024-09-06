@@ -119,8 +119,8 @@ proxy_config:
     ]
     allowed_fails: 3 # cooldown model if it fails > 1 call in a minute. 
     cooldown_time: 30 # how long to cooldown model if fails/min > allowed_fails
-    success_callback: ["langfuse"] #, "supabase"]
-    failure_callback: ["langfuse"] #, "supabase"]
+    success_callback: ["langfuse", "supabase"]
+    failure_callback: ["langfuse", "supabase"]
     drop_params: true
     set_verbose: false
     cache: true

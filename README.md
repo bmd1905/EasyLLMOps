@@ -59,6 +59,8 @@ Organizations looking to integrate LLMs into their operations.
     - [Install ELK Stack with Helm](#install-elk-stack-with-helm)
     - [Access Kibana](#access-kibana)
     - [Verify Log Collection](#verify-log-collection)
+  - [Optimize Cluster with Cast AI](#cast-ai-optmize-cluster)
+  - [Log and Trace with Langfuse and Supabase](#log-trace-langfuse-and-supabase)
 - [Contributing](#contributing)
 - [License](#license)
 - [Citation](#citation)
@@ -70,6 +72,12 @@ In case you don't want to spend much time, please run this script and enjoy your
 ```bash
 chmod +x ./cluster.sh
 ./cluster.sh
+```
+
+Remember to authenticate with GCP before using Terraform:
+
+```shell
+gcloud auth application-default login
 ```
 
 ### <a name="quick-start"></a>Quick Start
@@ -519,6 +527,46 @@ Open your browser and navigate to `http://localhost:5601`.
 You should now be able to see logs from your Kubernetes pods in Kibana. You can create dashboards and visualizations to analyze your logs and gain insights into your application's behavior.
 
 ![Access Kibana](assets/gifs/25-access-kibana.gif)
+
+### <a name="cast-ai-optmize-cluster"></a>Optimize Cluster with Cast AI
+
+Please go to [Cast AI](https://console.cast.ai/dashboard) to sign up for a free account and get the TOKEN.
+
+Then run this line to connect to GKE:
+
+```bash
+curl -H "Authorization: Token <TOKEN>" "https://api.cast.ai/v1/agent.yaml?provider=gke" | kubectl apply -f -
+```
+
+Hit `I ran this script` on Cast AI's UI, then copy the configuration code and paste it into the terminal:
+
+```bash
+CASTAI_API_TOKEN=<API_TOKEN> CASTAI_CLUSTER_ID=<CASTAI_CLUSTER_ID> CLUSTER_NAME=easy-llmops-gke INSTALL_AUTOSCALER=true INSTALL_POD_PINNER=true INSTALL_SECURITY_AGENT=true LOCATION=asia-southeast1-b PROJECT_ID=easy-llmops /bin/bash -c "$(curl -fsSL 'https://api.cast.ai/v1/scripts/gke/onboarding.sh')"
+```
+
+Hit `I ran this script` again and waite for the installation to complete.
+
+Then you can see your dashboards on Cast AI's UI:
+
+![](assets/images/cast-ai-dashboard1.jpg)
+
+![](assets/images/cast-ai-dashboard2.jpg)
+
+It's time to opmize your cluster with Cast AI! Go go the `Available savings` seaction and click `Rebalance` button.
+
+![](assets/images/cast-ai-optimize.jpg)
+
+
+### <a name="log-trace-langfuse-and-supabase"></a>Log Trace with Langfuse and Supabase
+
+- [Langfuse](https://langfuse.com) is an open source LLM engineering platform - LLM observability, metrics, evaluations, prompt management.
+- [Supabase](https://supabase.com) is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings.
+
+Please go to [Langfuse](https://cloud.langfuse.com) and [Supabase](https://supabase.com/dashboard/projects) to sign up for a free account and get API keys, then replace the placehoders in .env.example file with your API keys.
+
+![](assets/images/demo-langfuse-1.jpg)
+![](assets/images/demo-langfuse-2.jpg)
+![](assets/images/demo-supabase.jpg)
 
 ## Contributing
 We welcome contributions to EasyLLMOps! Please see our CONTRIBUTING.md for more information on how to get started.
