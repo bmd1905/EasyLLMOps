@@ -16,6 +16,8 @@ EasyLLMOps is a project built with Open WebUI that can be deployed on Google Kub
 - **Reduced Complexity**: Eliminate the hassle of complex configurations and infrastructure management, allowing you to focus on building and deploying powerful LLM applications.
 - **Enhanced Productivity**: Accelerate your LLM development lifecycle, optimize performance, and maximize the impact of your language models.
 
+https://github.com/user-attachments/assets/cf84a434-0dae-47b9-a93d-49a37965d968
+
 ## Target Audience
 
 Developers building and deploying LLM-powered applications.
