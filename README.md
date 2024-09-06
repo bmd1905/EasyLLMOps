@@ -114,7 +114,8 @@ To interact with your GKE cluster, you'll need to retrieve its configuration. Yo
 cat ~/.kube/config
 ```
 
-![Init Cluster](assets/gifs/1-init-cluster.gif)
+https://github.com/user-attachments/assets/3133c2a8-8475-45c6-8900-96c2af8c5ad5
+
 
 Ensure your `kubectl` context is set correctly to manage the cluster.
 
@@ -134,7 +135,7 @@ helm upgrade --install nginx-ingress ./deployments/nginx-ingress
 
 Please story the Nginx Ingress Controller's IP address, as you'll need it later.
 
-![Init Nginx Ingress Controller](assets/gifs/2-init-nginx-ingress-controller.gif)
+https://github.com/user-attachments/assets/f329a8ee-cd4d-44e8-bb12-d1ff39dce4b8
 
 **2. <a name="configure-api-key-secret"></a>Configure API Key Secret:**
 
@@ -148,7 +149,8 @@ kubectl create secret generic easyllmops-env --from-env-file=.env -n model-servi
 kubectl describe secret easyllmops-env -n model-serving
 ```
 
-![Deploy Secret](assets/gifs/3-deploy-secret.gif)
+https://github.com/user-attachments/assets/fab6aa93-2f68-4f36-a4d8-4a1d955596f2
+
 
 **3. <a name="grant-permissions"></a>Grant Permissions:**
 
@@ -160,7 +162,7 @@ kubectl apply -f role.yaml
 kubectl apply -f rolebinding.yaml
 ```
 
-![Grant Permission](assets/gifs/4-grant-permission.gif)
+https://github.com/user-attachments/assets/9c1aa6e1-6b8c-4332-ab11-513428ef763b
 
 **4. <a name="deploy-caching-service-using-redis"></a>Deploy caching service using Redis:**
 
@@ -171,7 +173,7 @@ helm dependency build
 helm upgrade --install redis .
 ```
 
-![Deploy Redis](assets/gifs/5-deploy-redis.gif)
+https://github.com/user-attachments/assets/ef37626a-9a98-473e-a7e0-effcaa262ad5
 
 **5. <a name="deploy-litellm"></a>Deploy LiteLLM:**
 
@@ -182,7 +184,8 @@ kubens model-serving
 helm upgrade --install litellm ./deployments/litellm
 ```
 
-![Deploy Litellm](assets/gifs/6-deploy-litellm.gif)
+https://github.com/user-attachments/assets/0c98fe90-f958-42fc-9fa6-224dcf417e29
+
 
 **6. <a name="deploy-the-open-webui"></a>Deploy the Open WebUI:**
 
@@ -193,13 +196,14 @@ cd open-webui
 kubectl apply -f ./kubernetes/manifest/base -n model-serving
 ```
 
-![Deploy Open WebUI](assets/gifs/7-deploy-openwebui.gif)
+https://github.com/user-attachments/assets/60ad30e3-e8f8-49a6-ab96-d895fe7986cb
+
 
 **7. <a name="play-around-with-the-application"></a>Play around with the Application:**
 
 Open browser and navigate to the URL of your GKE cluster (e.g. `http://172.0.0.0` in step 1) and add `.nip.io` to the end of the URL (e.g. `http://172.0.0.0.nip.io`). You should see the Open WebUI:
 
-![Final Web App](assets/gifs/8-final-web-app.gif)
+https://github.com/user-attachments/assets/4115a1f0-e513-4c58-a359-1d49683905a8
 
 ### <a name="continuous-integrationcontinuous-deployment-cicd-with-jenkins-and-ansible"></a>Continuous Integration/Continuous Deployment (CI/CD) with Jenkins and Ansible
 
@@ -221,7 +225,8 @@ Deploy Jenkins on a server by installing prerequisites, pulling a Docker image, 
 ansible-playbook -i iac/ansible/inventory iac/ansible/deploy_jenkins/deploy_jenkins.yaml
 ```
 
-![Create Ansible secrets](assets/gifs/9-create-ansible-secrets.gif)
+https://github.com/user-attachments/assets/35dae326-aa8f-4779-bf67-2b8d9f71487b
+
 
 **2. <a name="access-jenkins"></a>Access Jenkins:**
 
@@ -233,7 +238,7 @@ ssh-keygen
 
 Open `Metadata` and copy the `ssh-keys` value.
 
-![Create SSH key pair](assets/gifs/10-setup-ssh-key.gif)
+https://github.com/user-attachments/assets/8fd956be-d2db-4d85-aa7c-f78df160c00c
 
 We need to find the Jenkins server password to be able to access the server. First, access the Jenkins server:
 
@@ -248,7 +253,7 @@ sudo docker exec -it jenkins-server bash
 cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
-![Get Jenkins password](assets/gifs/11-get-jenkins-password.gif)
+https://github.com/user-attachments/assets/08cb4183-a383-4dd2-89e3-da6e74b92d04
 
 Once Jenkins is deployed, access it via your browser:
  
@@ -256,7 +261,7 @@ Once Jenkins is deployed, access it via your browser:
 http://<EXTERNAL_IP>:8081
 ```
 
-![Access Jenkins](assets/gifs/12-access-jenkins-server.gif)
+https://github.com/user-attachments/assets/4f0d3287-39ec-40e7-b333-9287ee37f9fc
 
 **3. <a name="install-jenkins-plugins"></a>Install Jenkins Plugins:**
 
@@ -273,7 +278,7 @@ After installing the plugins, restart Jenkins.
 sudo docker restart jenkins-server
 ```
 
-![Install Jenkins Plugins](assets/gifs/13-install-plugins.gif)
+https://github.com/user-attachments/assets/923f7aff-3983-4b3d-8ef5-17d2285aed63
 
 **4. <a name="configure-jenkins"></a>Configure Jenkins:**
 
@@ -281,13 +286,14 @@ sudo docker restart jenkins-server
 
 Go to the GitHub repository and click on `Settings`. Click on `Webhooks` and then click on `Add Webhook`. Enter the URL of your Jenkins server (e.g. `http://<EXTERNAL_IP>:8081/github-webhook/`). Then click on `Let me select individual events` and select `Let me select individual events`. Select `Push` and `Pull Request` and click on `Add Webhook`.
 
-![Add webhooks to GitHub repository](assets/gifs/14-add-webhooks.gif)
+https://github.com/user-attachments/assets/d6ec020a-3e93-4ce8-bf80-b9f63b227635
 
 4.2. Add Github repository as a Jenkins source code repository.
 
 Go to Jenkins dashboard and click on `New Item`. Enter a name for your project (e.g. `easy-llmops`) and select `Multibranch Pipeline`. Click on `OK`. Click on `Configure` and then click on `Add Source`. Select `GitHub` and click on `Add`. Enter the URL of your GitHub repository (e.g. `https://github.com/bmd1905/EasyLLMOps`). In the `Credentials` field, select `Add` and select `Username with password`. Enter your GitHub username and password (or use a personal access token). Click on `Test Connection` and then click on `Save`.
 
-![Add Github repository as a Jenkins source code repository](assets/gifs/15-add-github-repo.gif)
+https://github.com/user-attachments/assets/57c97866-caf3-4864-92c9-b91863822591
+
 
 4.3. Setup docker hub credentials.
 
@@ -295,24 +301,23 @@ First, create a Docker Hub account. Go to the Docker Hub website and click on `S
 
 From Jenkins dashboard, go to `Manage Jenkins` > `Credentials`. Click on `Add Credentials`. Select `Username with password` and click on `Add`. Enter your Docker Hub username, access token, and set `ID` to `dockerhub`.
 
-![Setup docker hub credentials](assets/gifs/16-setup-dockerhub-credentials.gif)
+https://github.com/user-attachments/assets/3df2f7e2-d284-4da9-82fb-cc65ebb6240b
 
 4.4. Setup Kubernetes credentials.
 
 First, create a Service Account for the Jenkins server to access the GKE cluster. Go to the GCP console and navigate to IAM & Admin > Service Accounts. Create a new service account with the `Kubernetes Engine Admin` role. Give the service account a name and description. Click on the service account and then click on the `Keys` tab. Click on `Add Key` and select `JSON` as the key type. Click on `Create` and download the JSON file.
 
-![Setup Kubernetes credentials](assets/gifs/17-setup-kubernetes-credentials.gif)
+https://github.com/user-attachments/assets/d294a5a3-8a3d-4271-b20c-3ebf237f4005
 
 Then, from Jenkins dashboard, go to `Manage Jenkins` > `Cloud`. Click on `New cloud`. Select `Kubernetes`. Enter the name of your cluster (e.g. `gke-easy-llmops-cluster-1), enter the URL and Certificate from your GKE cluster. In the `Kubernetes Namespace`, enter the namespace of your cluster (e.g. `model-serving`). In the `Credentials` field, select `Add` and select `Google Service Account from private`. Enter your project-id and the path to the JSON file.
 
-![Setup Kubernetes credentials](assets/gifs/18-setup-kubernetes-credentials.gif)
+https://github.com/user-attachments/assets/489ce405-a31f-4f56-94bb-faebe1edd849
 
 **5. <a name="test-the-setup"></a>Test the setup:**
 
 Push a new commit to your GitHub repository. You should see a new build in Jenkins.
 
-![Test the setup](assets/gifs/19-test-cicd.gif)
-
+https://github.com/user-attachments/assets/7f4d9286-b41f-4218-a970-fd45c8ecd01c
 
 ### <a name="monitoring-with-prometheus-and-grafana"></a>Monitoring with Prometheus and Grafana
 
@@ -320,8 +325,7 @@ Push a new commit to your GitHub repository. You should see a new build in Jenki
 
 First, create a Discord webhook. Go to the Discord website and click on `Server Settings`. Click on `Integrations`. Click on `Create Webhook`. Enter a name for your webhook (e.g. `easy-llmops-discord-webhook`) and click on `Create`. Copy the webhook URL.
 
-![Create Discord webhook](assets/gifs/20-create-discord-webhook.gif)
-
+https://github.com/user-attachments/assets/2f1258f0-b3c7-4b3b-8cc4-802034600a82
 
 **2. <a name="configure-helm-repositories"></a>Configure Helm Repositories**
 
@@ -359,7 +363,7 @@ This command does the following:
 - `deployments/monitoring/kube-prometheus-stack`: This is the chart to use for installation.
 - `-n monitoring`: This specifies the namespace to install into.
 
-![Deploy Prometheus](assets/gifs/21-start-monitoring-services.gif)
+https://github.com/user-attachments/assets/6828527c-9561-42bc-a221-fbbaf9097233
 
 By default, the services are not exposed externally. To access them, you can use port-forwarding:
 
@@ -379,7 +383,7 @@ The default credentials for Grafana are usually:
 - Username: admin
 - Password: prom-operator (you should change this immediately)
 
-![Access Prometheus and Grafana](assets/gifs/22-access-prom-graf.gif)
+https://github.com/user-attachments/assets/a9a2e7f7-0a88-4e21-ba63-7a3f993d1c78
 
 **5. <a name="test-alerting"></a>Test Alerting**
 
@@ -433,7 +437,7 @@ curl http://localhost:9093/api/v2/status
 
 Or, you can manually check the Discord channel.
 
-![Discord alert](assets/gifs/23-discord-alert.gif)
+https://github.com/user-attachments/assets/a5716e8c-ecd1-4457-80e9-27f23518bd1b
 
 ---
 
@@ -507,7 +511,7 @@ Install Filebeat:
 helm install elk-filebeat elastic/filebeat -f deployments/ELK/filebeat.expanded.yaml
 ```
 
-![Deploy ELK](assets/gifs/24-deploy-elk.gif)
+https://github.com/user-attachments/assets/75dbde44-6ce4-432d-9851-143e13a60fce
 
 **2. <a name="access-kibana"></a>Access Kibana:**
 
@@ -528,7 +532,7 @@ Open your browser and navigate to `http://localhost:5601`.
 
 You should now be able to see logs from your Kubernetes pods in Kibana. You can create dashboards and visualizations to analyze your logs and gain insights into your application's behavior.
 
-![Access Kibana](assets/gifs/25-access-kibana.gif)
+https://github.com/user-attachments/assets/a767e143-4fd2-406c-bf9f-9c5714b7404d
 
 ### <a name="cast-ai-optmize-cluster"></a>Optimize Cluster with Cast AI
 
