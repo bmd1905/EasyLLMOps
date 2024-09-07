@@ -1,0 +1,191 @@
+version: '3.9'
+
+networks:
+    monitoring:
+
+volumes:
+    prometheus_data:
+    grafana_data:
+    alertmanager_data:
+
+services:
+  redis:
+    image: redis/redis-stack:7.2.0-v6
+    container_name: redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./redis-data:/data
+    environment:
+      REDIS_ARGS: "--appendonly yes"
+    networks:
+      - default
+      - monitoring
+
+  easyllmops:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: easyllmops
+    container_name: easyllmops
+    command: ["sh", "-c", "make start-standalone-server"]
+    volumes:
+      - ./src:/app/src
+      - ./poetry.lock:/app/poetry.lock
+      - ./pyproject.toml:/app/pyproject.toml
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 512M
+        reservations:
+          cpus: "0.01"
+          memory: 64M
+      labels:
+        - "maintainer=bmd1905"
+    depends_on:
+      - redis
+    networks:
+      - default
+      - monitoring
+
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    ports:
+      - "4000:4000" # Map the container port to the host, change the host port if necessary
+    volumes:
+      - ./src/configs/litellm_config/litellm_config.yaml:/app/config.yaml # Mount the local configuration file
+    # You can change the port or number of workers as per your requirements or pass any new supported CLI augument. Make sure the port passed here matches with the container port defined above in `ports` value
+    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "4" ]
+    env_file:
+      - .env
+    networks:
+      - default
+      - monitoring
+
+
+  node-exporter:
+      image: prom/node-exporter:v1.3.1
+      container_name: node-exporter
+      volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      ports:
+      - 9101:9100
+      networks:
+      - monitoring
+
+
+  alertmanager:
+      image: prom/alertmanager:v0.25.0
+      container_name: alertmanager
+      restart: unless-stopped
+      volumes:
+      - ../monitoring/alertmanager_data:/alertmanager/data
+      - ../monitoring/alertmanager:/alertmanager
+      command:
+      - '--config.file=/alertmanager/config.yml'
+      - '--storage.path=/alertmanager/data'
+      - '--log.level=debug'
+      ports:
+      - 9093:9093
+      networks:
+      - monitoring
+
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - --docker_only
+      - --disable_metrics=disk,diskIO,network,tcp,udp,percpu,sched,process,hugetlb,referenced_memory
+      - --store_container_labels=false
+      - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name
+      - --allow_dynamic_housekeeping=true
+      - --housekeeping_interval=10s
+      - --disable_root_cgroup_stats  # Add this to avoid errors related to system UUID and product name
+    environment:
+      - CADVISOR_HEALTHCHECK_URL=http://localhost:8080/healthz
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - 8090:8080
+
+
+
+  prometheus:
+      image: prom/prometheus:v2.38.0
+      container_name: prometheus
+      restart: unless-stopped
+      volumes:
+          - prometheus_data:/prometheus
+          - ../monitoring/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+          - ../monitoring/prometheus/config/alert-rules.yml:/etc/prometheus/alert-rules.yml
+      command:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus'
+          - '--web.console.libraries=/etc/prometheus/console_libraries'
+          - '--web.console.templates=/etc/prometheus/consoles'
+          - '--storage.tsdb.retention.time=20h'
+          - '--web.enable-lifecycle'
+      ports:
+          - 9090:9090
+      networks:
+          - monitoring
+
+
+  grafana:
+      image: grafana/grafana:9.0.5
+      container_name: grafana
+      restart: unless-stopped
+      volumes:
+      - grafana_data:/var/lib/grafana
+      - ../monitoring/grafana/config/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ../monitoring/grafana/config/datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ../monitoring/grafana/dashboards:/opt/grafana/dashboards
+      environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      ports:
+      - 3000:3000
+      networks:
+      - monitoring
+      healthcheck:
+          test: ["CMD-SHELL", "curl -f localhost:3000/api/health && echo 'ready'"]
+          interval: 10s
+          retries: 10
+
+
+  jaeger:
+      image: jaegertracing/all-in-one:1.47
+      container_name: jaeger
+      restart: unless-stopped
+      ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+      networks:
+      - monitoring

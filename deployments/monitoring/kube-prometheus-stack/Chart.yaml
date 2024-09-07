@@ -1,0 +1,48 @@
+apiVersion: v2
+description: kube-prometheus-stack collects Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.
+icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
+type: application
+maintainers:
+  - name: QuentinBisson
+    email: quentin.bisson@gmail.com
+name: kube-prometheus-stack
+sources:
+  - https://github.com/prometheus-community/helm-charts
+  - https://github.com/prometheus-operator/kube-prometheus
+version: 62.3.0
+appVersion: v0.76.0
+kubeVersion: ">=1.19.0-0"
+home: https://github.com/prometheus-operator/kube-prometheus
+keywords:
+  - operator
+  - prometheus
+  - kube-prometheus
+annotations:
+  "artifacthub.io/license": Apache-2.0
+  "artifacthub.io/operator": "true"
+  "artifacthub.io/links": |
+    - name: Chart Source
+      url: https://github.com/prometheus-community/helm-charts
+    - name: Upstream Project
+      url: https://github.com/prometheus-operator/kube-prometheus
+
+dependencies:
+  - name: crds
+    version: "0.0.0"
+    condition: crds.enabled
+  - name: kube-state-metrics
+    version: "5.25.*"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: kubeStateMetrics.enabled
+  - name: prometheus-node-exporter
+    version: "4.39.*"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: nodeExporter.enabled
+  - name: grafana
+    version: "8.4.*"
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled
+  - name: prometheus-windows-exporter
+    repository: https://prometheus-community.github.io/helm-charts
+    version: "0.5.*"
+    condition: windowsMonitoring.enabled

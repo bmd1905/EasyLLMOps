@@ -1,0 +1,38 @@
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5s
+    inhibit_rules:
+      - source_matchers:
+          - 'severity = critical'
+        target_matchers:
+          - 'severity =~ warning|info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'severity = warning'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'alertname = InfoInhibitor'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+    route:
+      group_by: [ 'alertname', 'job' ]
+      group_wait: 15s
+      group_interval: 2m
+      repeat_interval: 4h
+      receiver: discord
+    receivers:
+      - name: discord
+        discord_configs:
+          - webhook_url: 'https://discord.com/api/webhooks/1279478330130825267/lP9uKOfkd-hbFfTcPCWkkBkwEIkb-1m1V_NWOGD7lnduqjawoQIJKkZU-PlQmn_w3Wbt' # deleted leu leu
+      - name: 'null'
+    templates:
+      - '/etc/alertmanager/config/*.tmpl'

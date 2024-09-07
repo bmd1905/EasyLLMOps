@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: v1.44.7
+dependencies:
+  - name: "postgresql"
+    version: ">=13.3.0"
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: db.deployStandalone
+  - name: redis
+    version: ">=18.0.0"
+    repository: oci://registry-1.docker.io/bitnamicharts 
+    condition: redis.enabled
+description: Call all LLM APIs using the OpenAI format
+name: litellm-helm
+type: application
+version: 0.1.411

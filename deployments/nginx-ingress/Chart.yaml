@@ -1,0 +1,17 @@
+apiVersion: v2
+appVersion: 3.2.1
+description: NGINX Ingress Controller
+home: https://github.com/nginxinc/kubernetes-ingress
+icon: https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.2.1/deployments/helm-chart/chart-icon.png
+keywords:
+- ingress
+- nginx
+kubeVersion: '>= 1.22.0-0'
+maintainers:
+- email: kubernetes@nginx.com
+  name: nginxinc
+name: nginx-ingress
+sources:
+- https://github.com/nginxinc/kubernetes-ingress/tree/v3.2.1/deployments/helm-chart
+type: application
+version: 0.18.1

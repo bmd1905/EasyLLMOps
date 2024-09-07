@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  easyllmops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: easyllmops
+    container_name: easyllmops
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+      - 4000:4000
+      - 6379:6379
+    volumes:
+      - ./redis-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 512M
+        reservations:
+          cpus: "0.01"
+          memory: 64M
+      labels:
+        - "maintainer=bmd1905"

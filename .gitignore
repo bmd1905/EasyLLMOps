@@ -14,7 +14,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -24,7 +23,6 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -166,3 +164,16 @@ cython_debug/
 # Redis
 *.rdb
 api/redis-data
+
+# DS_Store in subfolders
+**/.DS_Store
+
+
+# Alermanager
+monitoring/alertmanager_data
+
+
+# Ansible secrets
+iac/terraform/*.json
+iac/ansible/secrets/
+iac/ansible/inventory
