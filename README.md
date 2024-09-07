@@ -558,7 +558,7 @@ Then you can see your dashboards on Cast AI's UI:
 
 ![](assets/images/cast-ai-dashboard2.jpg)
 
-It's time to opmize your cluster with Cast AI! Go go the `Available savings` seaction and click `Rebalance` button.
+It's time to optimize your cluster with Cast AI! Go go the `Available savings` seaction and click `Rebalance` button.
 
 ![](assets/images/cast-ai-optimize.jpg)
 
